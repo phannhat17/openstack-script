@@ -16,7 +16,7 @@ add_repo() {
 function install_ops_packages () {
     echo "${YELLOW}Installing OpenStack client...${RESET}"
 
-	sudo apt-get install python-openstackclient -y
+	sudo apt-get install python3-openstackclient -y
 
     echo "${GREEN}OpenStack client added successfully.${RESET}"
 }
