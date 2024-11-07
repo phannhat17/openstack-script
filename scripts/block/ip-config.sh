@@ -30,6 +30,29 @@ change_hostname() {
     fi
 }
 
+# Function to update /etc/hosts with additional entries
+update_hosts_file() {
+    echo "${YELLOW}Updating /etc/hosts with additional entries...${RESET}"
+
+    # Check if the required variables are set in config.cfg
+    if [ -n "$CTL_HOSTONLY" ] && [ -n "$CTL_HOSTNAME" ] && \
+       [ -n "$COM_HOSTONLY" ] && [ -n "$COM_HOSTNAME" ] && \
+       [ -n "$BLK_HOSTONLY" ] && [ -n "$BLK_HOSTNAME" ]; then
+        
+        # Add the new entries to /etc/hosts
+        sudo tee -a /etc/hosts > /dev/null << EOF
+
+# Custom host entries
+$CTL_HOSTONLY $CTL_HOSTNAME
+$COM_HOSTONLY $COM_HOSTNAME
+$BLK_HOSTONLY $BLK_HOSTNAME
+EOF
+        echo "${GREEN}/etc/hosts updated successfully with new entries.${RESET}"
+    else
+        echo "${RED}One or more required variables are missing in config.cfg. Skipping hosts file update.${RESET}"
+    fi
+}
+
 # Function to change the IP address in the netplan configuration
 change_ip() {
     # Define the netplan file path (only YAML file in /etc/netplan/)
@@ -85,7 +108,10 @@ set_root_password
 # Step 2: Change the hostname based on config.cfg
 change_hostname
 
-# Step 3: Change IP configuration based on config.cfg
+# Step 3: Update /etc/hosts with additional entries
+update_hosts_file
+
+# Step 4: Change IP configuration based on config.cfg
 change_ip
 
 echo "${GREEN}All tasks completed.${RESET}"
