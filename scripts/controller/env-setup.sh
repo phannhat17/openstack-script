@@ -85,7 +85,7 @@ EOF
 }
 
 # Run the functions in sequence
-add_repo
+# add_repo - Uncomment to add OpenStack repository
 config_sql_database
 config_message_queue
 config_memcached
