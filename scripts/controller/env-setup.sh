@@ -84,8 +84,27 @@ EOF
     echo "${GREEN}Etcd configured successfully.${RESET}"
 }
 
+# Function to install and configure Chrony NTP service
+config_ntp_service() {
+    echo "${YELLOW}Installing and configuring Chrony...${RESET}"
+    
+    # Install Chrony
+    sudo apt install -y chrony
+
+    # Configure Chrony
+    sudo tee -a /etc/chrony/chrony.conf > /dev/null << EOF
+allow 10.0.0.0/24
+EOF
+
+    # Restart Chrony service
+    sudo service chrony restart
+    echo "${GREEN}Chrony configured successfully.${RESET}"
+}
+
+
 # Run the functions in sequence
 # add_repo - Uncomment to add OpenStack repository
+config_ntp_service
 config_sql_database
 config_message_queue
 config_memcached
