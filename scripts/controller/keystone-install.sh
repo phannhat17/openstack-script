@@ -116,6 +116,39 @@ setup_admin_env_vars() {
     echo "${GREEN}Environment variables set successfully.${RESET}"
 }
 
+# Function to create domain, projects, users, and roles
+create_domain_projects_users_roles() {
+    echo "${YELLOW}Creating domain, projects, users, and roles...${RESET}"
+    
+    # Source the admin credentials
+    source /root/admin-openrc
+
+    # Create a new domain
+    openstack domain create --description "An Example Domain" example
+    echo "${GREEN}Domain 'example' created.${RESET}"
+
+    # Create the service project
+    openstack project create --domain default --description "Service Project" service
+    echo "${GREEN}Project 'service' created.${RESET}"
+
+    # Create the demo project
+    openstack project create --domain default --description "Demo Project" myproject
+    echo "${GREEN}Project 'myproject' created.${RESET}"
+
+    # Create the myuser user and prompt for the password
+    openstack user create --domain default --password $DEMO_PASS myuser
+    echo "${GREEN}User 'myuser' created.${RESET}"
+
+    # Create the myrole role
+    openstack role create myrole
+    echo "${GREEN}Role 'myrole' created.${RESET}"
+
+    # Add the myrole role to the myproject project and myuser user
+    openstack role add --project myproject --user myuser myrole
+    echo "${GREEN}Role 'myrole' assigned to user 'myuser' in project 'myproject'.${RESET}"
+}
+
+
 # Run the functions in sequence
 create_openrc_files
 configure_keystone_database
@@ -125,5 +158,6 @@ initialize_fernet_keys
 bootstrap_keystone_service
 configure_apache
 setup_admin_env_vars
+create_domain_projects_users_roles 
 
 echo "${GREEN}OpenStack Identity (Keystone) setup completed.${RESET}"
