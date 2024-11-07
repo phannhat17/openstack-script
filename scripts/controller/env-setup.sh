@@ -12,6 +12,15 @@ add_repo() {
     echo "${GREEN}Repository added successfully.${RESET}"
 }
 
+# Function install OpenStack packages (python-openstackclient)
+function install_ops_packages () {
+    echo "${YELLOW}Installing OpenStack client...${RESET}"
+
+	sudo apt-get install python-openstackclient -y
+
+    echo "${GREEN}OpenStack client added successfully.${RESET}"
+}
+
 # Function to configure SQL database (MariaDB)
 config_sql_database() {
     echo "${YELLOW}Installing and configuring MariaDB...${RESET}"
