@@ -11,22 +11,22 @@ set_root_password() {
 
 # Function to change the hostname
 change_hostname() {
-    if [ -n "$NEW_HOSTNAME" ]; then
-        echo "${YELLOW}Changing hostname to ${GREEN}$NEW_HOSTNAME${RESET}..."
+    if [ -n "$CTL_HOSTNAME" ]; then
+        echo "${YELLOW}Changing hostname to ${GREEN}$CTL_HOSTNAME${RESET}..."
 
         # Update /etc/hostname
-        echo "$NEW_HOSTNAME" | sudo tee /etc/hostname > /dev/null
+        echo "$CTL_HOSTNAME" | sudo tee /etc/hostname > /dev/null
 
         # Update /etc/hosts (replace old hostname with new one and comment out 127.0.1.1)
         current_hostname=$(hostname)
-        sudo sed -i "s/$current_hostname/$NEW_HOSTNAME/g" /etc/hosts
+        sudo sed -i "s/$current_hostname/$CTL_HOSTNAME/g" /etc/hosts
         sudo sed -i "s/^127.0.1.1/#127.0.1.1/" /etc/hosts
 
         # Apply the new hostname immediately
-        sudo hostnamectl set-hostname "$NEW_HOSTNAME"
-        echo "${GREEN}Hostname changed to $NEW_HOSTNAME.${RESET}"
+        sudo hostnamectl set-hostname "$CTL_HOSTNAME"
+        echo "${GREEN}Hostname changed to $CTL_HOSTNAME.${RESET}"
     else
-        echo "${RED}NEW_HOSTNAME variable is not set in config.cfg. Skipping hostname change.${RESET}"
+        echo "${RED}CTL_HOSTNAME variable is not set in config.cfg. Skipping hostname change.${RESET}"
     fi
 }
 
