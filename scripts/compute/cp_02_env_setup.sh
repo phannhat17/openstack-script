@@ -3,11 +3,11 @@
 # Load configuration from config.cfg
 source ../config.cfg
 
-# Function update and upgrade for CONTROLLER
+# Function update and upgrade for compute
 update_upgrade () {
-    echo "${YELLOW}Update and Update controller...${RESET}"
+    echo "${YELLOW}Update and Update compute...${RESET}"
 	apt-get update -y&& apt-get upgrade -y
-    echo "${GREEN}Update and Update controller successfully.${RESET}"
+    echo "${GREEN}Update and Update compute successfully.${RESET}"
 }
 
 # Function to add OpenStack repository
