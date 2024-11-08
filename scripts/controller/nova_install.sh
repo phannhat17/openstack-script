@@ -7,7 +7,6 @@ source ../config.cfg
 configure_nova_databases() {
     echo "${YELLOW}Configuring Nova databases...${RESET}"
     
-    # Connect to MariaDB and create the Nova databases
     mysql -u root << EOF
 CREATE DATABASE nova_api;
 CREATE DATABASE nova;
@@ -47,7 +46,6 @@ create_nova_user() {
 create_nova_endpoints() {
     echo "${YELLOW}Creating Nova API endpoints...${RESET}"
 
-    # Create public, internal, and admin endpoints for Nova
     openstack endpoint create --region RegionOne compute public http://controller:8774/v2.1
     openstack endpoint create --region RegionOne compute internal http://controller:8774/v2.1
     openstack endpoint create --region RegionOne compute admin http://controller:8774/v2.1
@@ -59,67 +57,58 @@ create_nova_endpoints() {
 install_configure_nova() {
     echo "${YELLOW}Installing and configuring Nova...${RESET}"
     
-    # Install Nova packages
     sudo apt install -y nova-api nova-conductor nova-novncproxy nova-scheduler
 
-    # Configure Nova in /etc/nova/nova.conf
-    sudo tee /etc/nova/nova.conf > /dev/null << EOF
-[api_database]
-connection = mysql+pymysql://nova:$NOVA_DBPASS@controller/nova_api
+    local nova_conf="/etc/nova/nova.conf"
+    local nova_conf_bak="/etc/nova/nova.conf.bak"
+    cp $nova_conf $nova_conf_bak
+    egrep -v "^#|^$" $nova_conf_bak > $nova_conf
 
-[database]
-connection = mysql+pymysql://nova:$NOVA_DBPASS@controller/nova
+    crudini --set "$file" "api_database" "connection" "mysql+pymysql://nova:$NOVA_DBPASS@controller/nova_api"
 
-[DEFAULT]
-transport_url = rabbit://openstack:$RABBIT_PASS@controller:5672/
-my_ip = $CTL_HOSTONLY
+    crudini --set "$file" "database" "connection" "mysql+pymysql://nova:$NOVA_DBPASS@controller/nova"
 
-[api]
-auth_strategy = keystone
+    crudini --set "$file" "DEFAULT" "transport_url" "rabbit://openstack:$RABBIT_PASS@controller:5672/"
+    crudini --set "$file" "DEFAULT" "my_ip" "$CTL_HOSTONLY"
 
-[keystone_authtoken]
-www_authenticate_uri = http://controller:5000/
-auth_url = http://controller:5000/
-memcached_servers = controller:11211
-auth_type = password
-project_domain_name = Default
-user_domain_name = Default
-project_name = service
-username = nova
-password = $NOVA_PASS
+    crudini --set "$file" "api" "auth_strategy" "keystone"
 
-[service_user]
-send_service_user_token = true
-auth_url = http://controller:5000/v3
-auth_strategy = keystone
-auth_type = password
-project_domain_name = Default
-project_name = service
-user_domain_name = Default
-username = nova
-password = $NOVA_PASS
+    crudini --set "$file" "keystone_authtoken" "www_authenticate_uri" "http://controller:5000/"
+    crudini --set "$file" "keystone_authtoken" "auth_url" "http://controller:5000/"
+    crudini --set "$file" "keystone_authtoken" "memcached_servers" "controller:11211"
+    crudini --set "$file" "keystone_authtoken" "auth_type" "password"
+    crudini --set "$file" "keystone_authtoken" "project_domain_name" "Default"
+    crudini --set "$file" "keystone_authtoken" "user_domain_name" "Default"
+    crudini --set "$file" "keystone_authtoken" "project_name" "service"
+    crudini --set "$file" "keystone_authtoken" "username" "nova"
+    crudini --set "$file" "keystone_authtoken" "password" "$NOVA_PASS"
 
-[vnc]
-enabled = true
-server_listen = \$my_ip
-server_proxyclient_address = \$my_ip
+    crudini --set "$file" "service_user" "send_service_user_token" "true"
+    crudini --set "$file" "service_user" "auth_url" "http://controller:5000/v3"
+    crudini --set "$file" "service_user" "auth_strategy" "keystone"
+    crudini --set "$file" "service_user" "auth_type" "password"
+    crudini --set "$file" "service_user" "project_domain_name" "Default"
+    crudini --set "$file" "service_user" "project_name" "service"
+    crudini --set "$file" "service_user" "user_domain_name" "Default"
+    crudini --set "$file" "service_user" "username" "nova"
+    crudini --set "$file" "service_user" "password" "$NOVA_PASS"
 
-[glance]
-api_servers = http://controller:9292
+    crudini --set "$file" "vnc" "enabled" "true"
+    crudini --set "$file" "vnc" "server_listen" "\$my_ip"
+    crudini --set "$file" "vnc" "server_proxyclient_address" "\$my_ip"
 
-[oslo_concurrency]
-lock_path = /var/lib/nova/tmp
+    crudini --set "$file" "glance" "api_servers" "http://controller:9292"
 
-[placement]
-region_name = RegionOne
-project_domain_name = Default
-project_name = service
-auth_type = password
-user_domain_name = Default
-auth_url = http://controller:5000/v3
-username = placement
-password = $PLACEMENT_PASS
-EOF
+    crudini --set "$file" "oslo_concurrency" "lock_path" "/var/lib/nova/tmp"
+    
+    crudini --set "$file" "placement" "region_name" "RegionOne"
+    crudini --set "$file" "placement" "project_domain_name" "Default"
+    crudini --set "$file" "placement" "project_name" "service"
+    crudini --set "$file" "placement" "auth_type" "password"
+    crudini --set "$file" "placement" "user_domain_name" "Default"
+    crudini --set "$file" "placement" "auth_url" "http://controller:5000/v3"
+    crudini --set "$file" "placement" "username" "placement"
+    crudini --set "$file" "placement" "password" "$PLACEMENT_PASS"
 
     echo "${GREEN}Nova configuration updated.${RESET}"
 }
@@ -156,7 +145,6 @@ verify_cells() {
 finalize_nova_installation() {
     echo "${YELLOW}Finalizing Nova installation...${RESET}"
 
-    # Restart the Nova services
     sudo service nova-api restart
     sudo service nova-scheduler restart
     sudo service nova-conductor restart
