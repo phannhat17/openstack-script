@@ -72,6 +72,9 @@ change_ip() {
         cat << EOF | sudo tee $NETPLAN_FILE > /dev/null
 network:
   ethernets:
+    ens38:
+      dhcp4: true
+  
     ens37:
       dhcp4: no
       addresses:
