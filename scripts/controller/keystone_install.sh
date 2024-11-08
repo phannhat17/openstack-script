@@ -3,12 +3,6 @@
 # Load configuration from config.cfg
 source ../config.cfg
 
-# Color codes for output
-GREEN=$(tput setaf 2)
-YELLOW=$(tput setaf 3)
-RED=$(tput setaf 1)
-RESET=$(tput sgr0)
-
 # Function to create admin-openrc and demo-openrc files in /root/
 create_openrc_files() {
     echo "${YELLOW}Creating admin-openrc and demo-openrc files in /root/...${RESET}"
@@ -62,9 +56,14 @@ install_configure_keystone() {
     sudo apt install -y keystone
 
     # Configure Keystone
-    echo "${YELLOW}Configuring /etc/keystone/keystone.conf...${RESET}"
-    sudo sed -i "s|#connection =.*|connection = mysql+pymysql://keystone:$KEYSTONE_DBPASS@controller/keystone|" /etc/keystone/keystone.conf
-    sudo sed -i "s|#provider =.*|provider = fernet|" /etc/keystone/keystone.conf
+    local keystone_config="/etc/keystone/keystone.conf"
+    local keystonefilebak="/etc/keystone/keystone.conf.bak"
+    cp $keystone_config $keystonefilebak
+    egrep -v "^#|^$" $keystonefilebak > $keystone_config
+
+    echo "${YELLOW}Configuring $keystone_config...${RESET}"
+    crudini --set "$keystone_config" "database" "connection" "mysql+pymysql://keystone:$KEYSTONE_DBPASS@controller/keystone"
+    crudini --set "$keystone_config" "token" "provider" "fernet"
 
     echo "${GREEN}Keystone configuration updated.${RESET}"
 }
