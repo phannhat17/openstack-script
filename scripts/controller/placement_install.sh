@@ -57,23 +57,35 @@ install_configure_placement() {
     sudo apt install -y placement-api
 
     # Configure Placement in /etc/placement/placement.conf
-    sudo tee /etc/placement/placement.conf > /dev/null << EOF
-[placement_database]
-connection = mysql+pymysql://placement:$PLACEMENT_DBPASS@controller/placement
+    local placement_conf="/etc/placement/placement.conf"
+    local placement_conf_bak="/etc/placement/placement.conf.bak"
+    cp $placement_conf $placement_conf_bak
+    egrep -v "^#|^$" $placement_conf_bak > $placement_conf
 
-[api]
-auth_strategy = keystone
+    crudini --set "$placement_conf" "placement_database" "connection" "mysql+pymysql://placement:$PLACEMENT_DBPASS@controller/placement"
 
-[keystone_authtoken]
-auth_url = http://controller:5000/v3
-memcached_servers = controller:11211
-auth_type = password
-project_domain_name = Default
-user_domain_name = Default
-project_name = service
-username = placement
-password = $PLACEMENT_PASS
-EOF
+    crudini --set "$placement_conf" "api" "auth_strategy" "keystone"
+
+    crudini --set "$placement_conf" "keystone_authtoken" "auth_url" "http://controller:5000/v3"
+    crudini --set "$placement_conf" "keystone_authtoken" "memcached_servers" "controller:11211"
+    crudini --set "$placement_conf" "keystone_authtoken" "auth_type" "password"
+    crudini --set "$placement_conf" "keystone_authtoken" "project_domain_name" "Default"
+    crudini --set "$placement_conf" "keystone_authtoken" "user_domain_name" "Default"
+    crudini --set "$placement_conf" "keystone_authtoken" "project_name" "service"
+    crudini --set "$placement_conf" "keystone_authtoken" "username" "placement"
+    crudini --set "$placement_conf" "keystone_authtoken" "password" "$PLACEMENT_PASS"
+
+    # Comment out any other options in [keystone_authtoken]
+    local allowed_keys=("auth_url" "memcached_servers" "auth_type" "project_domain_name" "user_domain_name" "project_name" "username" "password")
+    sed -i "/^\[keystone_authtoken\]/,/^\[/{ 
+        /^\[keystone_authtoken\]/!{/^\[/!s/^\([^#].*\)/#\1/}
+    }" "$placement_conf"
+
+    # Uncomment required keys to ensure they remain active
+    for key in "${allowed_keys[@]}"; do
+        sed -i "/^\[keystone_authtoken\]/,/^\[/s/^#\($key[ ]*=.*\)/\1/" "$placement_conf"
+    done
+
 
     echo "${GREEN}Placement configuration updated.${RESET}"
 }
