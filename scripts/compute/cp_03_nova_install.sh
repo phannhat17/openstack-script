@@ -6,7 +6,6 @@ source ../config.cfg
 # Function to install the Nova compute service
 install_nova_compute() {
     echo "${YELLOW}Installing Nova Compute...${RESET}"
-    sudo apt update
     sudo apt install -y nova-compute
     echo "${GREEN}Nova Compute installed successfully.${RESET}"
 }
@@ -23,21 +22,10 @@ configure_nova_conf() {
 
     # [DEFAULT] section
     crudini --set "$nova_conf" "DEFAULT" "transport_url" "rabbit://openstack:$RABBIT_PASS@controller"
-    crudini --set "$nova_conf" "DEFAULT" "my_ip" "$MANAGEMENT_INTERFACE_IP_ADDRESS"
+    crudini --set "$nova_conf" "DEFAULT" "my_ip" "$COM_HOSTONLY"
 
     # [api] section
     crudini --set "$nova_conf" "api" "auth_strategy" "keystone"
-
-    # [keystone_authtoken] section
-    crudini --set "$nova_conf" "keystone_authtoken" "www_authenticate_uri" "http://controller:5000/"
-    crudini --set "$nova_conf" "keystone_authtoken" "auth_url" "http://controller:5000/"
-    crudini --set "$nova_conf" "keystone_authtoken" "memcached_servers" "controller:11211"
-    crudini --set "$nova_conf" "keystone_authtoken" "auth_type" "password"
-    crudini --set "$nova_conf" "keystone_authtoken" "project_domain_name" "Default"
-    crudini --set "$nova_conf" "keystone_authtoken" "user_domain_name" "Default"
-    crudini --set "$nova_conf" "keystone_authtoken" "project_name" "service"
-    crudini --set "$nova_conf" "keystone_authtoken" "username" "nova"
-    crudini --set "$nova_conf" "keystone_authtoken" "password" "$NOVA_PASS"
 
     # Comment out any other options in [keystone_authtoken]
     sed -i "/^\[keystone_authtoken\]/,/^\[/ s/^/#/" $nova_conf
@@ -65,7 +53,7 @@ configure_nova_conf() {
     # [vnc] section
     crudini --set "$nova_conf" "vnc" "enabled" "true"
     crudini --set "$nova_conf" "vnc" "server_listen" "0.0.0.0"
-    crudini --set "$nova_conf" "vnc" "server_proxyclient_address" "$MANAGEMENT_INTERFACE_IP_ADDRESS"
+    crudini --set "$nova_conf" "vnc" "server_proxyclient_address" "\$my_ip"
     crudini --set "$nova_conf" "vnc" "novncproxy_base_url" "http://controller:6080/vnc_auto.html"
 
     # [glance] section
@@ -73,16 +61,6 @@ configure_nova_conf() {
 
     # [oslo_concurrency] section
     crudini --set "$nova_conf" "oslo_concurrency" "lock_path" "/var/lib/nova/tmp"
-
-    # [placement] section
-    crudini --set "$nova_conf" "placement" "region_name" "RegionOne"
-    crudini --set "$nova_conf" "placement" "project_domain_name" "Default"
-    crudini --set "$nova_conf" "placement" "project_name" "service"
-    crudini --set "$nova_conf" "placement" "auth_type" "password"
-    crudini --set "$nova_conf" "placement" "user_domain_name" "Default"
-    crudini --set "$nova_conf" "placement" "auth_url" "http://controller:5000/v3"
-    crudini --set "$nova_conf" "placement" "username" "placement"
-    crudini --set "$nova_conf" "placement" "password" "$PLACEMENT_PASS"
 
     # Comment out any other options in [placement]
     sed -i "/^\[placement\]/,/^\[/ s/^/#/" $nova_conf
