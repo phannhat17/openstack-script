@@ -54,7 +54,8 @@ EOF
 
     # Enable support for domains
     echo "Enabling Keystone multi-domain support..."
-    sudo sed -i "s|^OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = .*|OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True|" "$local_settings"
+    echo "OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True" >> "$local_settings"
+    # sudo sed -i "s|^OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = .*|OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True|" "$local_settings"
 
     # Configure API versions
     echo "Configuring API versions..."
@@ -69,8 +70,12 @@ EOF
 
     # Set default domain and role
     echo "Setting default domain and role..."
-    sudo sed -i "s|^OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = .*|OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = \"Default\"|" "$local_settings"
-    sudo sed -i "s|^OPENSTACK_KEYSTONE_DEFAULT_ROLE = .*|OPENSTACK_KEYSTONE_DEFAULT_ROLE = \"user\"|" "$local_settings"
+
+    echo "OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = \"Default\"" >> "$local_settings"
+    echo "OPENSTACK_KEYSTONE_DEFAULT_ROLE = \"user\"" >> "$local_settings"
+
+    # sudo sed -i "s|^OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = .*|OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = \"Default\"|" "$local_settings"
+    # sudo sed -i "s|^OPENSTACK_KEYSTONE_DEFAULT_ROLE = .*|OPENSTACK_KEYSTONE_DEFAULT_ROLE = \"user\"|" "$local_settings"
 
     # Disable support for layer-3 networking services if required
     echo "Disabling layer-3 networking services (if required)..."
