@@ -34,6 +34,9 @@ create_glance_user() {
     # Create the Glance service entity
     openstack service create --name glance --description "OpenStack Image" image
 
+    # Make sure that the glance account has reader access to system-scope resources
+    openstack role add --user glance --user-domain Default --system all reader
+
     echo "${GREEN}Glance user and service credentials created successfully.${RESET}"
 }
 
@@ -55,7 +58,6 @@ create_glance_endpoints() {
     export GLANCE_ENDPOINT_ID=$public_endpoint
 }
 
-
 # Function to install and configure Glance
 install_configure_glance() {
     echo "${YELLOW}Installing and configuring Glance...${RESET}"
@@ -64,41 +66,39 @@ install_configure_glance() {
     sudo apt install -y glance
 
     # Configure Glance in /etc/glance/glance-api.conf
-    sudo tee /etc/glance/glance-api.conf > /dev/null << EOF
-[database]
-connection = mysql+pymysql://glance:$GLANCE_DBPASS@controller/glance
+    local glance_conf="/etc/glance/glance-api.conf"
+    local glance_conf_bak="/etc/glance/glance-api.conf.bak"
+    cp $glance_conf $glance_conf_bak
+    egrep -v "^#|^$" $glance_conf_bak > $glance_conf
 
-[keystone_authtoken]
-www_authenticate_uri = http://controller:5000
-auth_url = http://controller:5000
-memcached_servers = controller:11211
-auth_type = password
-project_domain_name = Default
-user_domain_name = Default
-project_name = service
-username = glance
-password = $GLANCE_PASS
+    crudini --set "$glance_conf" "database" "connection" "mysql+pymysql://glance:$GLANCE_DBPASS@controller/glance"
 
-[paste_deploy]
-flavor = keystone
+    crudini --set "$glance_conf" "keystone_authtoken" "www_authenticate_uri" "http://controller:5000"
+    crudini --set "$glance_conf" "keystone_authtoken" "auth_url" "http://controller:5000"
+    crudini --set "$glance_conf" "keystone_authtoken" "memcached_servers" "controller:11211"
+    crudini --set "$glance_conf" "keystone_authtoken" "auth_type" "password"
+    crudini --set "$glance_conf" "keystone_authtoken" "project_domain_name" "Default"
+    crudini --set "$glance_conf" "keystone_authtoken" "user_domain_name" "Default"
+    crudini --set "$glance_conf" "keystone_authtoken" "project_name" "service"
+    crudini --set "$glance_conf" "keystone_authtoken" "username" "glance"
+    crudini --set "$glance_conf" "keystone_authtoken" "password" "$GLANCE_PASS"
 
-[glance_store]
-default_backend = fs
-filesystem_store_datadir = /var/lib/glance/images/
+    crudini --set "$glance_conf" "paste_deploy" "flavor" "keystone"
 
-[DEFAULT]
-enabled_backends = fs:file
+    crudini --set "$glance_conf" "DEFAULT" "enabled_backends" "fs:file"
 
-[oslo_limit]
-auth_url = http://controller:5000
-auth_type = password
-user_domain_id = default
-username = glance
-system_scope = all
-password = $GLANCE_PASS
-endpoint_id = $GLANCE_ENDPOINT_ID
-region_name = RegionOne
-EOF
+    crudini --set "$glance_conf" "glance_store" "default_backend" "fs"
+
+    crudini --set "$glance_conf" "fs" "filesystem_store_datadir" "/var/lib/glance/images/"
+
+    crudini --set "$glance_conf" "oslo_limit" "auth_url" "http://controller:5000"
+    crudini --set "$glance_conf" "oslo_limit" "auth_type" "password"
+    crudini --set "$glance_conf" "oslo_limit" "user_domain_id" "default"
+    crudini --set "$glance_conf" "oslo_limit" "username" "glance"
+    crudini --set "$glance_conf" "oslo_limit" "system_scope" "all"
+    crudini --set "$glance_conf" "oslo_limit" "password" "$GLANCE_PASS"
+    crudini --set "$glance_conf" "oslo_limit" "endpoint_id" "$GLANCE_ENDPOINT_ID"
+    crudini --set "$glance_conf" "oslo_limit" "region_name" "RegionOne"
 
     echo "${GREEN}Glance configuration updated.${RESET}"
 }
