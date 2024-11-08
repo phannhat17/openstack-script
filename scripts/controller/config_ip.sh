@@ -117,4 +117,6 @@ update_hosts_file
 # Step 4: Change IP configuration based on config.cfg
 change_ip
 
+sudo reboot
+
 echo "${GREEN}All tasks completed.${RESET}"
