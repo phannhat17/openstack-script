@@ -83,6 +83,10 @@ config_etcd() {
 
     # Update /etc/default/etcd with required Etcd configuration
     local etcd_config="/etc/default/etcd"
+    local etcd_config_bak="/etc/default/etcd.bak"
+    cp $etcd_config $etcd_config_bak
+    egrep -v "^#|^$" $etcd_config_bak > $etcd_config
+
     crudini --set "$etcd_config" "" "ETCD_NAME" "\"controller\""
     crudini --set "$etcd_config" "" "ETCD_DATA_DIR" "\"/var/lib/etcd\""
     crudini --set "$etcd_config" "" "ETCD_INITIAL_CLUSTER_STATE" "\"new\""
