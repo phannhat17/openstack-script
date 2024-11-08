@@ -57,9 +57,9 @@ install_configure_keystone() {
 
     # Configure Keystone
     local keystone_config="/etc/keystone/keystone.conf"
-    local keystonefilebak="/etc/keystone/keystone.conf.bak"
-    cp $keystone_config $keystonefilebak
-    egrep -v "^#|^$" $keystonefilebak > $keystone_config
+    local keystone_config_bak="/etc/keystone/keystone.conf.bak"
+    cp $keystone_config $keystone_config_bak
+    egrep -v "^#|^$" $keystone_config_bak > $keystone_config
 
     echo "${YELLOW}Configuring $keystone_config...${RESET}"
     crudini --set "$keystone_config" "database" "connection" "mysql+pymysql://keystone:$KEYSTONE_DBPASS@controller/keystone"
