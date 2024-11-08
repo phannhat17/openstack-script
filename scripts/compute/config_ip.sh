@@ -3,12 +3,6 @@
 # Load configuration from config.cfg
 source ../config.cfg
 
-# Function to set the root password manually
-set_root_password() {
-    echo "${YELLOW}Setting root password...${RESET}"
-    sudo passwd root
-}
-
 # Function to change the hostname
 change_hostname() {
     if [ -n "$COM_HOSTNAME" ]; then
@@ -105,16 +99,10 @@ EOF
 
 # Run all functions as per the required sequence
 
-# Step 1: Set root password manually
-set_root_password
-
-# Step 2: Change the hostname based on config.cfg
 change_hostname
-
-# Step 3: Update /etc/hosts with additional entries
 update_hosts_file
-
-# Step 4: Change IP configuration based on config.cfg
 change_ip
+
+sudo reboot
 
 echo "${GREEN}All tasks completed.${RESET}"
