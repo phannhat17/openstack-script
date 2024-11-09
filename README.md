@@ -78,7 +78,3 @@ Read more [here](https://docs.openstack.org/install-guide/environment-networking
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-Feel free to customize this README further as you add or update features in your project!
