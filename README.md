@@ -75,7 +75,9 @@ Read more [here](https://docs.openstack.org/install-guide/environment-networking
 
     - On Storage:
 
-    Updating
+    ```bash
+    ./bk_01_cinder.sh
+    ```
 
 ## License
 
