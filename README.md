@@ -27,20 +27,53 @@ Read more [here](https://docs.openstack.org/install-guide/environment-networking
 
 2. **Prepare the Environment**
 
-   Ensure each node (Controller, Compute, Storage) is up and accessible within your host-only network. Also, ensure that IPs are set correctly in the configuration files.
+   Ensure each node (Controller, Compute, Storage) is up and accessible within your network. Also, ensure that IPs are set correctly in the configuration files.
 
-3. **Run the Script**
+3. **Run the IP config Script**
 
-   - On each node (Controller, Compute, Storage), run the respective script:
+   On each node (Controller, Compute, Storage), run the IP config script:
    
      ```bash
-     ./install-controller.sh  # Run this on the Controller Node
-     ./install-compute.sh     # Run this on the Compute Node
-     ./install-storage.sh     # Run this on the Storage Node
+     ./ctl_01_config_ip.sh  # Run this on the Controller Node
+     ./cp_01_config_ip.sh   # Run this on the Compute Node
+     ./config_ip.sh         # Run this on the Storage Node
      ```
 
-   Each script will install and configure the necessary OpenStack services for its respective node.
+   Each script will install and configure network on that Node. And will restart the Node after execution is complete.
 
+4. **Run the Enviroment Setup Script**
+
+   On Controller and Compute run the env config script:
+   
+    ```bash
+    ./ctl_02_env_setup.sh  # Run this on the Controller Node
+    ./cp_02_env_setup.sh   # Run this on the Compute Node
+    ```
+    
+4. **Run the Service install Script**
+
+   - On Controller:
+   
+    ```bash
+    ./ctl_03_keystone_install.sh
+    ./ctl_04_glance_install.sh
+    ./ctl_05_placement_install.sh
+    ./ctl_06_nova_install.sh
+    ./ctl_07_neutron_install.sh
+    ./ctl_08_horizon_install.sh
+    ./ctl_09_cinder_install.sh     
+    ```
+
+    - On Compute:
+
+    ```bash
+    ./cp_03_nova_install.sh
+    ./cp_04_neutron_install.sh
+    ```
+
+    - On Storage:
+
+    Updating
 
 ## License
 
