@@ -29,6 +29,8 @@ Read more [here](https://docs.openstack.org/install-guide/environment-networking
 
    Ensure each node (Controller, Compute, Storage) is up and accessible within your network. Also, ensure that IPs are set correctly in the configuration files.
 
+   The Storage Node needs to have atleast two disks connected. And if this Node use LVM on the OS disk, read more [here](https://docs.openstack.org/cinder/2024.1/install/cinder-storage-install-ubuntu.html)
+
 3. **Run the IP config Script**
 
    On each node (Controller, Compute, Storage), run the IP config script:
