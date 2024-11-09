@@ -11,7 +11,7 @@ Working with OpenStack 2024.1 and Ubuntu 22.04 LTS
 
 ## Network Topology
 
-![](assets/network-topology.png)
+![](./assets/network-topo.png)
 
 Read more [here](https://docs.openstack.org/install-guide/environment-networking.html). Due to the limitations of VMware the host only network cannot access the internet and can only create 1 NAT network so the Management Network cannot access Internet. Im using another network interface to provide Internet access to all nodes.
 
