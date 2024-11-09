@@ -2,15 +2,22 @@
 
 This repository contains a set of scripts to automate the installation and configuration of OpenStack on a multi-node setup with one Controller node, one Compute node, and one Storage node. These scripts are intended for educational and experimental purposes, particularly in a cybersecurity lab environment.
 
+Working with OpenStack 2024.1 and Ubuntu 22.04 LTS
+
 ## Requirements
 
-- **Operating System**: Ubuntu server 22.04 or compatible Linux distribution
+- **Operating System**: Ubuntu server 22.04
 - **Virtualization Software**: VMware Workstation (or another compatible hypervisor)
 
+## Network Topology
+
+![](assets/network-topology.png)
+
+Read more [here](https://docs.openstack.org/install-guide/environment-networking.html). Due to the limitations of VMware the host only network cannot access the internet and can only create 1 NAT network so the Management Network cannot access Internet. Im using another network interface to provide Internet access to all nodes.
 
 ## Installation
 
-1. **Clone the Repository**
+### 1. **Clone the Repository**
 
    ```bash
    git clone https://github.com/phannhat17/openstack-script.git
