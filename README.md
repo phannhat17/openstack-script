@@ -35,8 +35,10 @@ The Storage Node needs to have atleast two disks connected. And if this Node use
 
 On each node (Controller, Compute, Storage), run the IP config script:
 
+**Note: Run this inside the `script` folder**
+
 ```bash
-./scripts/config_ip.sh
+./config_ip.sh
 ```
 
 The script will prompt you to select which node (Controller, Compute, or Storage) you are configuring. It will then update the network settings adn reboot that node.
@@ -45,8 +47,10 @@ The script will prompt you to select which node (Controller, Compute, or Storage
 
 On each node (Controller, Compute, Storage), run the service install script:
 
+**Note: Run this inside the `script` folder**
+
 ```bash
-./scripts/install_service.sh
+./install_service.sh
 ```
 
 The script will prompt you to select which node (Controller, Compute, or Storage) you are configuring.
