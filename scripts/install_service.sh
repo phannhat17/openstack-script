@@ -4,7 +4,6 @@
 install_controller() {
     echo "${YELLOW}Installing services on Controller Node...${RESET}"
     
-    ./controller/ctl_01_config_ip.sh
     ./controller/ctl_02_env_setup.sh
     ./controller/ctl_03_keystone_install.sh
     ./controller/ctl_04_glance_install.sh
@@ -22,7 +21,6 @@ install_controller() {
 install_compute() {
     echo "${YELLOW}Installing services on Compute Node...${RESET}"
     
-    ./compute/cp_01_config_ip.sh
     ./compute/cp_02_env_setup.sh
     ./compute/cp_03_nova_install.sh
     ./compute/cp_04_neutron_install.sh
@@ -34,7 +32,7 @@ install_compute() {
 install_storage() {
     echo "${YELLOW}Installing services on Storage Node...${RESET}"
     
-    ./block/bk_01_cinder.sh
+    ./block/blk_01_cinder.sh
 
     echo "${GREEN}Storage Node installation completed.${RESET}"
 }

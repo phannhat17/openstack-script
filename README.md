@@ -36,48 +36,20 @@ Read more [here](https://docs.openstack.org/install-guide/environment-networking
    On each node (Controller, Compute, Storage), run the IP config script:
    
      ```bash
-     ./ctl_01_config_ip.sh  # Run this on the Controller Node
-     ./cp_01_config_ip.sh   # Run this on the Compute Node
-     ./config_ip.sh         # Run this on the Storage Node
+     ./scripts/config_ip.sh
      ```
-
-   Each script will install and configure network on that Node. And will restart the Node after execution is complete.
+     
+   The script will prompt you to select which node (Controller, Compute, or Storage) you are configuring. It will then update the network settings adn reboot that node.
 
 4. **Run the Enviroment Setup Script**
 
-   On Controller and Compute run the env config script:
+   On each node (Controller, Compute, Storage), run the service install script:
    
-    ```bash
-    ./ctl_02_env_setup.sh  # Run this on the Controller Node
-    ./cp_02_env_setup.sh   # Run this on the Compute Node
-    ```
-    
-4. **Run the Service install Script**
-
-   - On Controller:
-   
-    ```bash
-    ./ctl_03_keystone_install.sh
-    ./ctl_04_glance_install.sh
-    ./ctl_05_placement_install.sh
-    ./ctl_06_nova_install.sh
-    ./ctl_07_neutron_install.sh
-    ./ctl_08_horizon_install.sh
-    ./ctl_09_cinder_install.sh     
-    ```
-
-    - On Compute:
-
-    ```bash
-    ./cp_03_nova_install.sh
-    ./cp_04_neutron_install.sh
-    ```
-
-    - On Storage:
-
-    ```bash
-    ./bk_01_cinder.sh
-    ```
+     ```bash
+     ./scripts/install_service.sh
+     ```
+     
+   The script will prompt you to select which node (Controller, Compute, or Storage) you are configuring.
 
 ## License
 

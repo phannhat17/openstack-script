@@ -51,8 +51,10 @@ EOF
 change_ip() {
     local management_ip_var="$1"
     local provider_ip_var="$2"
+    local host_control_ip_var="$3"
     local management_ip="${!management_ip_var}"
     local provider_ip="${!provider_ip_var}"
+    local host_control_ip="${!host_control_ip_var}"
 
     # Define the netplan file path (only YAML file in /etc/netplan/)
     NETPLAN_FILE=$(find /etc/netplan/ -type f -name "*.yaml" | head -n 1)
@@ -62,14 +64,16 @@ change_ip() {
         exit 1
     fi
 
-    if [ -n "$management_ip" ] && [ -n "$provider_ip" ]; then
+    if [ -n "$management_ip" ] && [ -n "$provider_ip" ] && [ -n "$host_control_ip" ]; then
         echo "${YELLOW}Updating IP configuration...${RESET}"
         
         cat << EOF | sudo tee $NETPLAN_FILE > /dev/null
 network:
   ethernets:
-    $INTERFACE_DHCP:
-      dhcp4: true
+    $INTERFACE_HOST_CONTROL:
+      dhcp4: no
+      addresses:
+        - ${host_control_ip}/${NETMASK}
       
     $INTERFACE_MANAGEMENT:
       dhcp4: no
@@ -77,10 +81,10 @@ network:
         - ${management_ip}/${NETMASK}
       routes:
         - to: 0.0.0.0/0
-          via: ${OS_MANAGEMENT_GATEWAY}
+          via: ${GW_MANAGEMENT}
       nameservers:
         addresses:
-          - ${OS_MANAGEMENT_DNS}
+          - 8.8.8.8
 
     $INTERFACE_PROVIDER:
       dhcp4: no
@@ -88,10 +92,10 @@ network:
         - ${provider_ip}/${NETMASK}
       routes:
         - to: 0.0.0.0/0
-          via: ${OS_PROVIDER_GATEWAY}
+          via: ${GW_PROVIDER}
       nameservers:
         addresses:
-          - ${OS_PROVIDER_DNS}
+          - 8.8.8.8
 
   version: 2
 EOF
@@ -113,15 +117,15 @@ read -p "Enter the number corresponding to the node: " node_choice
 case $node_choice in
     1)
         change_hostname CTL_HOSTNAME
-        change_ip CTL_MANAGEMENT CTL_PROVIDER
+        change_ip CTL_MANAGEMENT CTL_PROVIDER CTL_HOST_CONTROL
         ;;
     2)
         change_hostname COM_HOSTNAME
-        change_ip COM_MANAGEMENT COM_PROVIDER
+        change_ip COM_MANAGEMENT COM_PROVIDER COM_HOST_CONTROL
         ;;
     3)
         change_hostname BLK_HOSTNAME
-        change_ip BLK_MANAGEMENT BLK_PROVIDER
+        change_ip BLK_MANAGEMENT BLK_PROVIDER BLK_HOST_CONTROL
         ;;
     *)
         echo "${RED}Invalid choice. Exiting.${RESET}"
