@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load configuration from config.cfg
-source ../../config.cfg
+source config.cfg
 
 # Function to create provider network and subnet
 create_provider_network_and_subnet() {

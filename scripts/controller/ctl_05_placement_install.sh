@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load configuration from config.cfg
-source ../config.cfg
+source config.cfg
 
 # Function to configure the Placement database
 configure_placement_database() {

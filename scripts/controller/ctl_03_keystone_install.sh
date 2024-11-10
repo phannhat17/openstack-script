@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load configuration from config.cfg
-source ../config.cfg
+source config.cfg
 
 # Function to create admin-openrc and demo-openrc files in /root/
 create_openrc_files() {

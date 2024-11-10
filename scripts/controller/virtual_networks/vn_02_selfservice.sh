@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load configuration from config.cfg
-source ../../config.cfg
+source config.cfg
 
 # Function to create self-service network, subnet, and router with provider connectivity
 create_self_service_network() {

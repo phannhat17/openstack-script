@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Load configuration variables if needed
-source ../config.cfg
+# Load configuration from config.cfg
+source config.cfg
 
 OPENSTACK_HOST="controller"
 ALLOWED_HOSTS="['*']"  # Replace with actual hosts or use ['*'] for development

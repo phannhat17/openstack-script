@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load configuration from config.cfg
-source ../config.cfg
+source config.cfg
 
 source ./virtual_networks/vn_01_provider.sh
 source ./virtual_networks/vn_02_selfservice.sh
