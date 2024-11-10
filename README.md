@@ -43,7 +43,7 @@ On each node (Controller, Compute, Storage), run the IP config script:
 
 The script will prompt you to select which node (Controller, Compute, or Storage) you are configuring. It will then update the network settings adn reboot that node.
 
-### 4. **Run the Enviroment Setup Script**
+### 4. **Run the Service install Script**
 
 On each node (Controller, Compute, Storage), run the service install script:
 
