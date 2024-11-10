@@ -11,7 +11,7 @@ Working with OpenStack 2024.1 and Ubuntu 22.04 LTS
 
 ## Network Topology
 
-Updating
+*Updating*
 
 <!-- ![](./assets/network-topo.png)
 
@@ -29,7 +29,7 @@ Read more [here](https://docs.openstack.org/install-guide/environment-networking
 
 2. **Prepare the Environment**
 
-   Ensure each node (Controller, Compute, Storage) is up and accessible within your network. Also, ensure that IPs are set correctly in the configuration files.
+   Ensure each node (Controller, Compute, Storage) is up and accessible as **root** within your network. Also, ensure that IPs are set correctly in the configuration files.
 
    The Storage Node needs to have atleast two disks connected. And if this Node use LVM on the OS disk, read more [here](https://docs.openstack.org/cinder/2024.1/install/cinder-storage-install-ubuntu.html)
 
