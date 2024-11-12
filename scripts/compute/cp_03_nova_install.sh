@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load configuration from config.cfg
-source ../config.cfg
+source config.cfg
 
 # Function to install the Nova compute service
 install_nova_compute() {

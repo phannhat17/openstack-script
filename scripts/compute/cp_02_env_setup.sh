@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load configuration from config.cfg
-source ../config.cfg
+source config.cfg
 
 # Function update and upgrade for compute
 update_upgrade () {

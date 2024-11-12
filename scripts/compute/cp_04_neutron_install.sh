@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load configuration from config.cfg
-source ../config.cfg
+source config.cfg
 
 # Function to install the Neutron Open vSwitch agent
 install_neutron_openvswitch_agent() {
