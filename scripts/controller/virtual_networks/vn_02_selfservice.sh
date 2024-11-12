@@ -13,8 +13,8 @@ create_self_service_network() {
 
     echo "${YELLOW}Creating a subnet on the self-service network...${RESET}"
     openstack subnet create --network selfservice \
-    --dns-nameserver $MNG_DNS --gateway $MNG_GATEWAY \
-    --subnet-range $MNG_SUBNET selfservice
+    --dns-nameserver $OS_MANAGEMENT_DNS --gateway $OS_MANAGEMENT_GATEWAY \
+    --subnet-range $OS_MANAGEMENT_SUBNET selfservice
     echo "${GREEN}Self-service subnet created successfully.${RESET}"
 
     echo "${YELLOW}Creating router...${RESET}"

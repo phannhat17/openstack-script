@@ -15,9 +15,9 @@ create_provider_network_and_subnet() {
 
     echo "${YELLOW}Creating a subnet on the provider network...${RESET}"
     openstack subnet create --network provider \
-      --allocation-pool start=$PROVIDER_IP_START,end=$PROVIDER_IP_END \
-      --dns-nameserver $PROVIDER_DNS --gateway $PROVIDER_GATEWAY \
-      --subnet-range $PROVIDER_SUBNET provider
+      --allocation-pool start=$OS_PROVIDER_IP_START,end=$OS_PROVIDER_IP_END \
+      --dns-nameserver $OS_PROVIDER_DNS --gateway $OS_PROVIDER_GATEWAY \
+      --subnet-range $OS_PROVIDER_SUBNET provider
 
     echo "${GREEN}Provider subnet created successfully.${RESET}"
 }
