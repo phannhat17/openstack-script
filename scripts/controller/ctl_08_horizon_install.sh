@@ -35,18 +35,18 @@ configure_dashboard_settings() {
     sudo sed -i "/^COMPRESS_OFFLINE =/s/^/#/" "$local_settings"
 
 
-    # Configure memcached session storage
-    # echo "Configuring session storage with memcached..."
-#     sudo sed -i "s|^SESSION_ENGINE = .*|SESSION_ENGINE = 'django.contrib.sessions.backends.cache'|" "$local_settings"
-#     sudo sed -i "/^CACHES = {/,+5 d" "$local_settings"
-#     cat <<EOF | sudo tee -a "$local_settings" > /dev/null
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-#         'LOCATION': '$MEMCACHED_LOCATION',
-#     }
-# }
-# EOF
+    Configure memcached session storage
+    echo "Configuring session storage with memcached..."
+    # sudo sed -i "s|^SESSION_ENGINE = .*|SESSION_ENGINE = 'django.contrib.sessions.backends.cache'|" "$local_settings"
+    sudo sed -i "/^CACHES = {/,+5 d" "$local_settings"
+    cat <<EOF | sudo tee -a "$local_settings" > /dev/null
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '$MEMCACHED_LOCATION',
+    }
+}
+EOF
 
     # # Comment out any other session storage configuration
     # echo "Commenting out other session storage configurations..."
