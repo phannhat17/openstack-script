@@ -23,6 +23,7 @@ Read more [here](https://docs.openstack.org/install-guide/environment-networking
 git clone https://github.com/phannhat17/openstack-script.git
 cd openstack-script
 find . -type f -exec chmod +x {} \;
+cd scripts
 ```
 
 ### 2. **Prepare the Environment**
@@ -35,7 +36,7 @@ The Storage Node needs to have atleast two disks connected. And if this Node use
 
 On each node (Controller, Compute, Storage), run the IP config script:
 
-**Note: Run this inside the `script` folder**
+**Note: Run this inside the `scripts` folder**
 
 ```bash
 ./config_ip.sh
@@ -47,7 +48,7 @@ The script will prompt you to select which node (Controller, Compute, or Storage
 
 On each node (Controller, Compute, Storage), run the service install script:
 
-**Note: Run this inside the `script` folder**
+**Note: Run this inside the `scripts` folder**
 
 ```bash
 ./install_service.sh
