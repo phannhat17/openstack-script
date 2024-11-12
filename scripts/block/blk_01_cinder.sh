@@ -45,7 +45,7 @@ install_configure_cinder() {
 
     crudini --set "$cinder_conf" "DEFAULT" "transport_url" "rabbit://openstack:$RABBIT_PASS@controller"
     crudini --set "$cinder_conf" "DEFAULT" "auth_strategy" "keystone"
-    crudini --set "$cinder_conf" "DEFAULT" "my_ip" "$BLK_HOSTONLY"
+    crudini --set "$cinder_conf" "DEFAULT" "my_ip" "$BLK_MANAGEMENT"
     crudini --set "$cinder_conf" "DEFAULT" "enabled_backends" "lvm"
     crudini --set "$cinder_conf" "DEFAULT" "glance_api_servers" "http://controller:9292"
 

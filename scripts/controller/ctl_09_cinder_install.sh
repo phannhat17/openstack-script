@@ -77,7 +77,7 @@ install_configure_cinder() {
     crudini --set "$cinder_conf" "keystone_authtoken" "password" "$CINDER_PASS"
 
     # Configure the my_ip option for the management IP
-    crudini --set "$cinder_conf" "DEFAULT" "my_ip" "$CTL_HOSTONLY"
+    crudini --set "$cinder_conf" "DEFAULT" "my_ip" "$CTL_MANAGEMENT"
 
     # Configure lock path for Oslo Concurrency
     crudini --set "$cinder_conf" "oslo_concurrency" "lock_path" "/var/lib/cinder/tmp"

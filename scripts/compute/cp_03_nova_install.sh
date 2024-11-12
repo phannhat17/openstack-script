@@ -22,7 +22,7 @@ configure_nova_conf() {
 
     # [DEFAULT] section
     crudini --set "$nova_conf" "DEFAULT" "transport_url" "rabbit://openstack:$RABBIT_PASS@controller"
-    crudini --set "$nova_conf" "DEFAULT" "my_ip" "$COM_HOSTONLY"
+    crudini --set "$nova_conf" "DEFAULT" "my_ip" "$COM_PROVIDER"
 
     # [api] section
     crudini --set "$nova_conf" "api" "auth_strategy" "keystone"

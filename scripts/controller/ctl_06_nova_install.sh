@@ -69,7 +69,7 @@ install_configure_nova() {
     crudini --set "$nova_conf" "database" "connection" "mysql+pymysql://nova:$NOVA_DBPASS@controller/nova"
 
     crudini --set "$nova_conf" "DEFAULT" "transport_url" "rabbit://openstack:$RABBIT_PASS@controller:5672/"
-    crudini --set "$nova_conf" "DEFAULT" "my_ip" "$CTL_HOSTONLY"
+    crudini --set "$nova_conf" "DEFAULT" "my_ip" "$CTL_MANAGEMENT"
 
     crudini --set "$nova_conf" "api" "auth_strategy" "keystone"
 

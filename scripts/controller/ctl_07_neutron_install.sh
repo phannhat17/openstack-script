@@ -125,7 +125,7 @@ configure_openvswitch_agent() {
     egrep -v "^#|^$" $openvswitch_agent_conf_bak > $openvswitch_agent_conf
 
     crudini --set "$openvswitch_agent_conf" "ovs" "bridge_mappings" "provider:$OS_PROVIDER_BRIDGE_NAME"
-    crudini --set "$openvswitch_agent_conf" "ovs" "local_ip" "$CTL_HOSTONLY"
+    crudini --set "$openvswitch_agent_conf" "ovs" "local_ip" "$CTL_MANAGEMENT"
 
     crudini --set "$openvswitch_agent_conf" "agent" "tunnel_types" "vxlan"
     crudini --set "$openvswitch_agent_conf" "agent" "l2_population" "true"

@@ -44,7 +44,7 @@ configure_openvswitch_agent() {
 
     # [ovs] section - map provider network and configure overlay IP
     crudini --set "$ovs_agent_conf" "ovs" "bridge_mappings" "provider:$PROVIDER_BRIDGE_NAME"
-    crudini --set "$ovs_agent_conf" "ovs" "local_ip" "$COM_HOSTONLY"
+    crudini --set "$ovs_agent_conf" "ovs" "local_ip" "$COM_PROVIDER"
 
     # Ensure the provider bridge is created and add the provider interface to the bridge
     echo "${YELLOW}Creating provider bridge and adding interface...${RESET}"

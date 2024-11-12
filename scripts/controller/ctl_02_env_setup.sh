@@ -37,7 +37,7 @@ config_sql_database() {
     sudo apt install -y mariadb-server python3-pymysql
 
     local mariadb_conf="/etc/mysql/mariadb.conf.d/99-openstack.cnf"
-    crudini --set "$mariadb_conf" "mysqld" "bind-address" "$CTL_HOSTONLY"
+    crudini --set "$mariadb_conf" "mysqld" "bind-address" "$CTL_MANAGEMENT"
     crudini --set "$mariadb_conf" "mysqld" "default-storage-engine" "innodb"
     crudini --set "$mariadb_conf" "mysqld" "innodb_file_per_table" "on"
     crudini --set "$mariadb_conf" "mysqld" "max_connections" "4096"
@@ -69,7 +69,7 @@ config_memcached() {
     sudo apt install -y memcached python3-memcache
 
     # Configure Memcached
-    sudo sed -i "s/^-l 127.0.0.1/-l $CTL_HOSTONLY/" /etc/memcached.conf
+    sudo sed -i "s/^-l 127.0.0.1/-l $CTL_MANAGEMENT/" /etc/memcached.conf
 
     # Restart Memcached
     sudo service memcached restart
@@ -91,11 +91,11 @@ config_etcd() {
     crudini --set "$etcd_config" "" "ETCD_DATA_DIR" "\"/var/lib/etcd\""
     crudini --set "$etcd_config" "" "ETCD_INITIAL_CLUSTER_STATE" "\"new\""
     crudini --set "$etcd_config" "" "ETCD_INITIAL_CLUSTER_TOKEN" "\"etcd-cluster-01\""
-    crudini --set "$etcd_config" "" "ETCD_INITIAL_CLUSTER" "\"controller=http://$CTL_HOSTONLY:2380\""
-    crudini --set "$etcd_config" "" "ETCD_INITIAL_ADVERTISE_PEER_URLS" "\"http://$CTL_HOSTONLY:2380\""
-    crudini --set "$etcd_config" "" "ETCD_ADVERTISE_CLIENT_URLS" "\"http://$CTL_HOSTONLY:2379\""
+    crudini --set "$etcd_config" "" "ETCD_INITIAL_CLUSTER" "\"controller=http://$CTL_MANAGEMENT:2380\""
+    crudini --set "$etcd_config" "" "ETCD_INITIAL_ADVERTISE_PEER_URLS" "\"http://$CTL_MANAGEMENT:2380\""
+    crudini --set "$etcd_config" "" "ETCD_ADVERTISE_CLIENT_URLS" "\"http://$CTL_MANAGEMENT:2379\""
     crudini --set "$etcd_config" "" "ETCD_LISTEN_PEER_URLS" "\"http://0.0.0.0:2380\""
-    crudini --set "$etcd_config" "" "ETCD_LISTEN_CLIENT_URLS" "\"http://$CTL_HOSTONLY:2379\""
+    crudini --set "$etcd_config" "" "ETCD_LISTEN_CLIENT_URLS" "\"http://$CTL_MANAGEMENT:2379\""
 
     # Enable and restart Etcd
     sudo systemctl enable etcd

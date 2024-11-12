@@ -40,7 +40,7 @@ config_ntp_service() {
 
     # Configure Chrony
     local chrony_conf="/etc/chrony/chrony.conf"
-    echo "server $CTL_HOSTONLY iburst" >> $chrony_conf
+    echo "server $CTL_MANAGEMENT iburst" >> $chrony_conf
 
     # Restart Chrony service
     sudo service chrony restart
