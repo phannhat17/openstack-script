@@ -124,7 +124,7 @@ configure_openvswitch_agent() {
     cp $openvswitch_agent_conf $openvswitch_agent_conf_bak
     egrep -v "^#|^$" $openvswitch_agent_conf_bak > $openvswitch_agent_conf
 
-    crudini --set "$openvswitch_agent_conf" "ovs" "bridge_mappings" "provider:$PROVIDER_BRIDGE_NAME"
+    crudini --set "$openvswitch_agent_conf" "ovs" "bridge_mappings" "provider:$OS_PROVIDER_BRIDGE_NAME"
     crudini --set "$openvswitch_agent_conf" "ovs" "local_ip" "$CTL_HOSTONLY"
 
     crudini --set "$openvswitch_agent_conf" "agent" "tunnel_types" "vxlan"
@@ -133,8 +133,8 @@ configure_openvswitch_agent() {
     crudini --set "$openvswitch_agent_conf" "securitygroup" "enable_security_group" "true"
     crudini --set "$openvswitch_agent_conf" "securitygroup" "firewall_driver" "openvswitch"
 
-    sudo ovs-vsctl add-br $PROVIDER_BRIDGE_NAME
-    sudo ovs-vsctl add-port $PROVIDER_BRIDGE_NAME $PROVIDER_INTERFACE_NAME
+    sudo ovs-vsctl add-br $OS_PROVIDER_BRIDGE_NAME
+    sudo ovs-vsctl add-port $OS_PROVIDER_BRIDGE_NAME $OS_PROVIDER_INTERFACE_NAME
 
     echo "${GREEN}Open vSwitch agent configured successfully.${RESET}"
 

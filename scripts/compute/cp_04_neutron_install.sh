@@ -48,8 +48,8 @@ configure_openvswitch_agent() {
 
     # Ensure the provider bridge is created and add the provider interface to the bridge
     echo "${YELLOW}Creating provider bridge and adding interface...${RESET}"
-    sudo ovs-vsctl add-br $PROVIDER_BRIDGE_NAME
-    sudo ovs-vsctl add-port $PROVIDER_BRIDGE_NAME $PROVIDER_INTERFACE_NAME
+    sudo ovs-vsctl add-br $OS_PROVIDER_BRIDGE_NAME
+    sudo ovs-vsctl add-port $OS_PROVIDER_BRIDGE_NAME $OS_PROVIDER_INTERFACE_NAME
 
     # [agent] section - enable VXLAN and layer-2 population
     crudini --set "$ovs_agent_conf" "agent" "tunnel_types" "vxlan"
