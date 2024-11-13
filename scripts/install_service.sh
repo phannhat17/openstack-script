@@ -113,7 +113,8 @@ install_compute() {
 # Function to install services on the Storage node
 install_storage() {
     echo "Installing services on Storage Node..."
-    ./block/blk_01_cinder.sh
+    ./block/blk_01_env_setup.sh
+    ./block/blk_02_cinder.sh
     echo "Storage Node installation completed."
 }
 
