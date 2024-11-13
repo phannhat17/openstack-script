@@ -1,40 +1,119 @@
 #!/bin/bash
 
-# Function to execute scripts for the Controller node
+# Function to install services on the Controller node
 install_controller() {
-    echo "${YELLOW}Installing services on Controller Node...${RESET}"
-    
-    ./controller/ctl_02_env_setup.sh
-    ./controller/ctl_03_keystone_install.sh
-    ./controller/ctl_04_glance_install.sh
-    ./controller/ctl_05_placement_install.sh
-    ./controller/ctl_06_nova_install.sh
-    ./controller/ctl_07_neutron_install.sh
-    ./controller/ctl_08_horizon_install.sh
-    ./controller/ctl_09_cinder_install.sh
-    ./controller/ctl_10_pre_launch_instance.sh
+    echo "Select services to install on Controller Node (e.g., 1 2 or 1-4):"
+    echo "1) Keystone"
+    echo "2) Glance"
+    echo "3) Nova"
+    echo "4) Neutron"
+    echo "5) Cinder"
+    echo "A) All"
+    read -p "Enter your choice: " service_choice
 
-    echo "${GREEN}Controller Node installation completed.${RESET}"
+    # Function to install a specific service by number
+    install_service() {
+        case $1 in
+            1)
+                ./controller/ctl_03_keystone_install.sh
+                ;;
+            2)
+                ./controller/ctl_04_glance_install.sh
+                ;;
+            3)
+                ./controller/ctl_06_nova_install.sh
+                ;;
+            4)
+                ./controller/ctl_07_neutron_install.sh
+                ;;
+            5)
+                ./controller/ctl_09_cinder_install.sh
+                ;;
+            *)
+                echo "Invalid service number: $1"
+                ;;
+        esac
+    }
+
+    # Handle the "All" option
+    if [[ "$service_choice" =~ [Aa] ]]; then
+        ./controller/ctl_02_env_setup.sh
+        ./controller/ctl_03_keystone_install.sh
+        ./controller/ctl_04_glance_install.sh
+        ./controller/ctl_05_placement_install.sh
+        ./controller/ctl_06_nova_install.sh
+        ./controller/ctl_07_neutron_install.sh
+        ./controller/ctl_08_horizon_install.sh
+        ./controller/ctl_09_cinder_install.sh
+        ./controller/ctl_10_pre_launch_instance.sh
+    else
+        # Split input by spaces
+        IFS=' ' read -r -a choices <<< "$service_choice"
+        for choice in "${choices[@]}"; do
+            if [[ "$choice" =~ ^[0-9]+-[0-9]+$ ]]; then
+                # Handle ranges like 1-4
+                IFS='-' read -r start end <<< "$choice"
+                for ((i=start; i<=end; i++)); do
+                    install_service "$i"
+                done
+            else
+                # Handle individual numbers
+                install_service "$choice"
+            fi
+        done
+    fi
+
+    echo "Controller Node installation completed."
 }
 
-# Function to execute scripts for the Compute node
+# Function to install services on the Compute node
 install_compute() {
-    echo "${YELLOW}Installing services on Compute Node...${RESET}"
-    
-    ./compute/cp_02_env_setup.sh
-    ./compute/cp_03_nova_install.sh
-    ./compute/cp_04_neutron_install.sh
+    echo "Select services to install on Compute Node (e.g., 1 2 or 1-2):"
+    echo "1) Nova"
+    echo "2) Neutron"
+    echo "A) All"
+    read -p "Enter your choice: " service_choice
 
-    echo "${GREEN}Compute Node installation completed.${RESET}"
+    install_service() {
+        case $1 in
+            1)
+                ./compute/cp_03_nova_install.sh
+                ;;
+            2)
+                ./compute/cp_04_neutron_install.sh
+                ;;
+            *)
+                echo "Invalid service number: $1"
+                ;;
+        esac
+    }
+
+    if [[ "$service_choice" =~ [Aa] ]]; then
+        ./compute/cp_02_env_setup.sh
+        ./compute/cp_03_nova_install.sh
+        ./compute/cp_04_neutron_install.sh
+    else
+        IFS=' ' read -r -a choices <<< "$service_choice"
+        for choice in "${choices[@]}"; do
+            if [[ "$choice" =~ ^[0-9]+-[0-9]+$ ]]; then
+                IFS='-' read -r start end <<< "$choice"
+                for ((i=start; i<=end; i++)); do
+                    install_service "$i"
+                done
+            else
+                install_service "$choice"
+            fi
+        done
+    fi
+
+    echo "Compute Node installation completed."
 }
 
-# Function to execute scripts for the Storage node
+# Function to install services on the Storage node
 install_storage() {
-    echo "${YELLOW}Installing services on Storage Node...${RESET}"
-    
+    echo "Installing services on Storage Node..."
     ./block/blk_01_cinder.sh
-
-    echo "${GREEN}Storage Node installation completed.${RESET}"
+    echo "Storage Node installation completed."
 }
 
 # Main script logic
@@ -55,9 +134,9 @@ case $node_choice in
         install_storage
         ;;
     *)
-        echo "${RED}Invalid choice. Exiting.${RESET}"
+        echo "Invalid choice. Exiting."
         exit 1
         ;;
 esac
 
-echo "${GREEN}Installation process completed.${RESET}"
+echo "Installation process completed."
