@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Load configuration from config.cfg
 source config.cfg
@@ -22,7 +23,7 @@ configure_nova_conf() {
 
     # [DEFAULT] section
     crudini --set "$nova_conf" "DEFAULT" "transport_url" "rabbit://openstack:$RABBIT_PASS@controller"
-    crudini --set "$nova_conf" "DEFAULT" "my_ip" "$COM_PROVIDER"
+    crudini --set "$nova_conf" "DEFAULT" "my_ip" "$COM_MANAGEMENT"
 
     # [api] section
     crudini --set "$nova_conf" "api" "auth_strategy" "keystone"

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Load configuration from config.cfg
 source config.cfg
@@ -112,7 +113,7 @@ config_ntp_service() {
 
     # Configure Chrony
     local chrony_conf="/etc/chrony/chrony.conf"
-    echo "allow 10.0.0.0/24" >> $chrony_conf
+    echo "allow $MANAGEMENT_NW/24" >> $chrony_conf
 
     # Restart Chrony service
     sudo service chrony restart

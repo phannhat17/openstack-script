@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Function to install services on the Controller node
 install_controller() {
