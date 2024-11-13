@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # Load configuration from config.cfg
 source config.cfg
@@ -145,6 +144,9 @@ network:
       nameservers:
         addresses:
           - 8.8.8.8
+          
+    $OS_PROVIDER_INTERFACE_NAME:
+      dhcp4: no
 
   bridges:
     $OS_PROVIDER_BRIDGE_NAME:

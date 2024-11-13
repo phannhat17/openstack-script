@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # Load configuration from config.cfg
 source config.cfg
