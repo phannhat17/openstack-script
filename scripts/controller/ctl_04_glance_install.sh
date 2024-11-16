@@ -124,10 +124,10 @@ finalize_glance_installation() {
 verify_glance () {
     echo "${YELLOW}Verifying Glance...${RESET}"
 
-	source /root/admin-openrc
+    source /root/admin-openrc
 
-	apt-get install wget -y
-	wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+    apt-get install wget -y
+    wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
 
     glance image-create --name "cirros" \
     --file cirros-0.4.0-x86_64-disk.img \
@@ -135,7 +135,7 @@ verify_glance () {
     --visibility=public
 	  
     # Check if glance image-list contains the expected "active" status for "cirros"
-    if glance image-list | grep -q 'cirros.*active'; then
+    if openstack image list | grep -q 'cirros.*active'; then
         echo "${GREEN}Glance is ready to work.${RESET}"
     else
         echo "${RED}Glance image verification failed. Exiting.${RESET}"
