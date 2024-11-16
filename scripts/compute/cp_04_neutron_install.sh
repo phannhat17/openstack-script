@@ -86,7 +86,7 @@ configure_openvswitch_agent() {
     egrep -v "^#|^$" $ovs_agent_conf_bak > $ovs_agent_conf
 
     # [ovs] section - map provider network and configure overlay IP
-    crudini --set "$ovs_agent_conf" "ovs" "bridge_mappings" "provider:$PROVIDER_BRIDGE_NAME"
+    crudini --set "$ovs_agent_conf" "ovs" "bridge_mappings" "provider:$OS_PROVIDER_BRIDGE_NAME"
     crudini --set "$ovs_agent_conf" "ovs" "local_ip" "$COM_MANAGEMENT"
 
     # [agent] section - enable VXLAN and layer-2 population
