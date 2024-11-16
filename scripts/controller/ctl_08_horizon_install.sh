@@ -42,7 +42,7 @@ configure_dashboard_settings() {
     cat <<EOF | sudo tee -a "$local_settings" > /dev/null
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
         'LOCATION': '$MEMCACHED_LOCATION',
     }
 }
