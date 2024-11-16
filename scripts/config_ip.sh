@@ -54,7 +54,6 @@ change_ip() {
     local host_control_ip_var="$3"
     local management_ip="${!management_ip_var}"
     local provider_ip="${!provider_ip_var}"
-    local host_control_ip="${!host_control_ip_var}"
 
     # Define the netplan file path (only YAML file in /etc/netplan/)
     NETPLAN_FILE=$(find /etc/netplan/ -type f -name "*.yaml" | head -n 1)
@@ -64,27 +63,16 @@ change_ip() {
         exit 1
     fi
 
-    if [ -n "$management_ip" ] && [ -n "$provider_ip" ] && [ -n "$host_control_ip" ]; then
+    if [ -n "$management_ip" ] && [ -n "$provider_ip" ]; then
         echo "${YELLOW}Updating IP configuration...${RESET}"
         
         cat << EOF | sudo tee $NETPLAN_FILE > /dev/null
 network:
   ethernets:
-    $INTERFACE_HOST_CONTROL:
-      dhcp4: no
-      addresses:
-        - ${host_control_ip}/${NETMASK}
-      
     $INTERFACE_MANAGEMENT:
       dhcp4: no
       addresses:
         - ${management_ip}/${NETMASK}
-      routes:
-        - to: 0.0.0.0/0
-          via: ${GW_MANAGEMENT}
-      nameservers:
-        addresses:
-          - 8.8.8.8
 
     $INTERFACE_PROVIDER:
       dhcp4: no
