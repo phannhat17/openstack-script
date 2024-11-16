@@ -89,15 +89,6 @@ configure_openvswitch_agent() {
     crudini --set "$ovs_agent_conf" "ovs" "bridge_mappings" "provider:$PROVIDER_BRIDGE_NAME"
     crudini --set "$ovs_agent_conf" "ovs" "local_ip" "$COM_MANAGEMENT"
 
-    # Ensure the provider bridge is created and add the provider interface to the bridge
-    # Flush IP from OS_PROVIDER_INTERFACE_NAME
-    sudo ip addr flush dev $OS_PROVIDER_INTERFACE_NAME
-
-    echo "${YELLOW}Creating provider bridge and adding interface...${RESET}"
-    sudo ovs-vsctl add-br $OS_PROVIDER_BRIDGE_NAME
-    sudo ovs-vsctl add-port $OS_PROVIDER_BRIDGE_NAME $OS_PROVIDER_INTERFACE_NAME
-    sudo ip addr add "$COM_PROVIDER/$NETMASK" dev $OS_PROVIDER_BRIDGE_NAME
-
     # [agent] section - enable VXLAN and layer-2 population
     crudini --set "$ovs_agent_conf" "agent" "tunnel_types" "vxlan"
     crudini --set "$ovs_agent_conf" "agent" "l2_population" "true"
@@ -105,36 +96,23 @@ configure_openvswitch_agent() {
     # [securitygroup] section - enable security groups and set firewall driver
     crudini --set "$ovs_agent_conf" "securitygroup" "enable_security_group" "true"
     crudini --set "$ovs_agent_conf" "securitygroup" "firewall_driver" "openvswitch"
-    
+
     # Enable bridge filter support
+    sudo sysctl -w net.ipv4.ip_forward=1
+
     sudo modprobe br_netfilter
-    sudo tee /etc/sysctl.d/99-sysctl.conf > /dev/null << SYSCTL_EOF
-net.bridge.bridge-nf-call-iptables=1
-net.bridge.bridge-nf-call-ip6tables=1
-SYSCTL_EOF
-    sudo sysctl --system
+    sudo sysctl -w net.bridge.bridge-nf-call-iptables=1
+    sudo sysctl -w net.bridge.bridge-nf-call-arptables=1
+    sudo sysctl -w net.bridge.bridge-nf-call-ip6tables=1
+
+    # Ensure the provider bridge is created and add the provider interface to the bridge
+    echo "${YELLOW}Creating provider bridge and adding interface...${RESET}"
+    sudo ovs-vsctl add-br $OS_PROVIDER_BRIDGE_NAME
+    sudo ovs-vsctl add-port $OS_PROVIDER_BRIDGE_NAME $OS_PROVIDER_INTERFACE_NAME
 
     update_netplan_for_ovs
 
     echo "${GREEN}Open vSwitch agent configuration completed.${RESET}"
-}
-
-# Function to enable bridge networking support for the hybrid iptables firewall driver (if required)
-enable_bridge_networking() {
-    echo "${YELLOW}Enabling bridge networking support for hybrid iptables firewall...${RESET}"
-
-    # Load the br_netfilter kernel module
-    sudo modprobe br_netfilter
-
-    # Enable bridge filtering for iptables
-    sudo tee /etc/sysctl.d/99-sysctl.conf > /dev/null << EOF
-net.bridge.bridge-nf-call-iptables=1
-net.bridge.bridge-nf-call-ip6tables=1
-EOF
-
-    # Apply the changes
-    sudo sysctl --system
-    echo "${GREEN}Bridge networking support enabled.${RESET}"
 }
 
 # Function to configure nova.conf to use Neutron
@@ -169,7 +147,6 @@ install_neutron_openvswitch_agent
 configure_neutron_conf
 
 configure_openvswitch_agent
-enable_bridge_networking
 
 configure_nova_conf_for_neutron
 restart_services

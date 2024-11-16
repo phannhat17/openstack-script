@@ -175,25 +175,21 @@ configure_openvswitch_agent() {
     crudini --set "$openvswitch_agent_conf" "securitygroup" "enable_security_group" "true"
     crudini --set "$openvswitch_agent_conf" "securitygroup" "firewall_driver" "openvswitch"
 
-    # Flush IP from OS_PROVIDER_INTERFACE_NAME
-    sudo ip addr flush dev $OS_PROVIDER_INTERFACE_NAME
+    # Enable bridge filter support
+    sudo sysctl -w net.ipv4.ip_forward=1
+
+    sudo modprobe br_netfilter
+    sudo sysctl -w net.bridge.bridge-nf-call-iptables=1
+    sudo sysctl -w net.bridge.bridge-nf-call-arptables=1
+    sudo sysctl -w net.bridge.bridge-nf-call-ip6tables=1
 
     # Add IP to OS_PROVIDER_BRIDGE_NAME
     sudo ovs-vsctl add-br $OS_PROVIDER_BRIDGE_NAME
     sudo ovs-vsctl add-port $OS_PROVIDER_BRIDGE_NAME $OS_PROVIDER_INTERFACE_NAME
-    sudo ip addr add "$CTL_PROVIDER/$NETMASK" dev $OS_PROVIDER_BRIDGE_NAME
-
-    echo "${GREEN}Open vSwitch agent configured successfully.${RESET}"
-
-    # Enable bridge filter support
-    sudo modprobe br_netfilter
-    sudo tee /etc/sysctl.d/99-sysctl.conf > /dev/null << SYSCTL_EOF
-net.bridge.bridge-nf-call-iptables=1
-net.bridge.bridge-nf-call-ip6tables=1
-SYSCTL_EOF
-    sudo sysctl --system
-
+    
     update_netplan_for_ovs
+
+    echo "${GREEN}Open vSwitch agent configured successfully.${RESET}"    
 }
 
 # Function to configure layer-3 (L3) agent

@@ -7,6 +7,8 @@ source config.cfg
 create_self_service_network() {
     source /root/demo-openrc
 
+    sleep 2
+
     echo "${YELLOW}Creating self-service network...${RESET}"
     openstack network create selfservice
     echo "${GREEN}Self-service network created successfully.${RESET}"
