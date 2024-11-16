@@ -85,18 +85,6 @@ configure_openvswitch_agent() {
     cp $ovs_agent_conf $ovs_agent_conf_bak
     egrep -v "^#|^$" $ovs_agent_conf_bak > $ovs_agent_conf
 
-    # [ovs] section - map provider network and configure overlay IP
-    crudini --set "$ovs_agent_conf" "ovs" "bridge_mappings" "provider:$OS_PROVIDER_BRIDGE_NAME"
-    crudini --set "$ovs_agent_conf" "ovs" "local_ip" "$COM_MANAGEMENT"
-
-    # [agent] section - enable VXLAN and layer-2 population
-    crudini --set "$ovs_agent_conf" "agent" "tunnel_types" "vxlan"
-    crudini --set "$ovs_agent_conf" "agent" "l2_population" "true"
-
-    # [securitygroup] section - enable security groups and set firewall driver
-    crudini --set "$ovs_agent_conf" "securitygroup" "enable_security_group" "true"
-    crudini --set "$ovs_agent_conf" "securitygroup" "firewall_driver" "openvswitch"
-
     # Enable bridge filter support
     sudo sysctl -w net.ipv4.ip_forward=1
 
@@ -109,6 +97,19 @@ configure_openvswitch_agent() {
     echo "${YELLOW}Creating provider bridge and adding interface...${RESET}"
     sudo ovs-vsctl add-br $OS_PROVIDER_BRIDGE_NAME
     sudo ovs-vsctl add-port $OS_PROVIDER_BRIDGE_NAME $OS_PROVIDER_INTERFACE_NAME
+
+
+    # [ovs] section - map provider network and configure overlay IP
+    crudini --set "$ovs_agent_conf" "ovs" "bridge_mappings" "provider:$OS_PROVIDER_BRIDGE_NAME"
+    crudini --set "$ovs_agent_conf" "ovs" "local_ip" "$COM_MANAGEMENT"
+
+    # [agent] section - enable VXLAN and layer-2 population
+    crudini --set "$ovs_agent_conf" "agent" "tunnel_types" "vxlan"
+    crudini --set "$ovs_agent_conf" "agent" "l2_population" "true"
+
+    # [securitygroup] section - enable security groups and set firewall driver
+    crudini --set "$ovs_agent_conf" "securitygroup" "enable_security_group" "true"
+    crudini --set "$ovs_agent_conf" "securitygroup" "firewall_driver" "openvswitch"
 
     update_netplan_for_ovs
 
@@ -150,5 +151,7 @@ configure_openvswitch_agent
 
 configure_nova_conf_for_neutron
 restart_services
+
+reboot
 
 echo "${GREEN}OpenStack Networking (Neutron) setup on compute node completed.${RESET}"

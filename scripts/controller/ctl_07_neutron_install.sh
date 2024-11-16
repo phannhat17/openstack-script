@@ -160,6 +160,19 @@ EOF
 # Function to configure the Open vSwitch (OVS) agent
 configure_openvswitch_agent() {
     echo "${YELLOW}Configuring Open vSwitch (OVS) agent...${RESET}"
+
+    # Enable bridge filter support
+    sudo sysctl -w net.ipv4.ip_forward=1
+
+    sudo modprobe br_netfilter
+    sudo sysctl -w net.bridge.bridge-nf-call-iptables=1
+    sudo sysctl -w net.bridge.bridge-nf-call-arptables=1
+    sudo sysctl -w net.bridge.bridge-nf-call-ip6tables=1
+
+    # Add IP to OS_PROVIDER_BRIDGE_NAME
+    sudo ovs-vsctl add-br $OS_PROVIDER_BRIDGE_NAME
+    sudo ovs-vsctl add-port $OS_PROVIDER_BRIDGE_NAME $OS_PROVIDER_INTERFACE_NAME
+
     
     local openvswitch_agent_conf="/etc/neutron/plugins/ml2/openvswitch_agent.ini"
     local openvswitch_agent_conf_bak="/etc/neutron/plugins/ml2/openvswitch_agent.ini.bak"
@@ -174,18 +187,6 @@ configure_openvswitch_agent() {
 
     crudini --set "$openvswitch_agent_conf" "securitygroup" "enable_security_group" "true"
     crudini --set "$openvswitch_agent_conf" "securitygroup" "firewall_driver" "openvswitch"
-
-    # Enable bridge filter support
-    sudo sysctl -w net.ipv4.ip_forward=1
-
-    sudo modprobe br_netfilter
-    sudo sysctl -w net.bridge.bridge-nf-call-iptables=1
-    sudo sysctl -w net.bridge.bridge-nf-call-arptables=1
-    sudo sysctl -w net.bridge.bridge-nf-call-ip6tables=1
-
-    # Add IP to OS_PROVIDER_BRIDGE_NAME
-    sudo ovs-vsctl add-br $OS_PROVIDER_BRIDGE_NAME
-    sudo ovs-vsctl add-port $OS_PROVIDER_BRIDGE_NAME $OS_PROVIDER_INTERFACE_NAME
     
     update_netplan_for_ovs
 
@@ -291,5 +292,7 @@ configure_dhcp_agent
 configure_nova_for_neutron
 populate_neutron_database
 finalize_neutron_installation
+
+reboot
 
 echo "${GREEN}OpenStack Networking (Neutron) setup completed.${RESET}"
