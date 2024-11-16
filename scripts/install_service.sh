@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Load configuration from config.cfg
+source config.cfg
+
 # File to store installed services
 STATUS_FILE="services_status.log"
 
@@ -21,9 +24,9 @@ mark_installed() {
 # Function to display service status
 service_status() {
     if is_installed "$1"; then
-        echo "(installed)"
+        echo "${GREEN}(installed)${RESET}"
     else
-        echo ""
+        echo "${YELLOW}(not installed)${RESET}"
     fi
 }
 
