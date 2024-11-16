@@ -46,35 +46,23 @@ update_netplan_for_ovs() {
     cat << EOF | sudo tee $NETPLAN_FILE > /dev/null
 network:
   ethernets:
-    $INTERFACE_HOST_CONTROL:
-      dhcp4: no
-      addresses:
-        - ${COM_HOST_CONTROL}/${NETMASK}
-
     $INTERFACE_MANAGEMENT:
       dhcp4: no
       addresses:
         - ${COM_MANAGEMENT}/${NETMASK}
-      routes:
-        - to: 0.0.0.0/0
-          via: ${GW_MANAGEMENT}
-      nameservers:
-        addresses:
-          - 8.8.8.8
-          
     $OS_PROVIDER_INTERFACE_NAME:
       dhcp4: no
 
   bridges:
-    $OS_PROVIDER_BRIDGE_NAME:
-      dhcp4: no
+    br0:
       interfaces:
-        - $OS_PROVIDER_INTERFACE_NAME
+        - ${OS_PROVIDER_INTERFACE_NAME}
+      dhcp4: no
       addresses:
         - ${COM_PROVIDER}/${NETMASK}
       routes:
         - to: 0.0.0.0/0
-          via: ${OS_PROVIDER_GATEWAY}
+          via: ${GW_PROVIDER}
       nameservers:
         addresses:
           - 8.8.8.8
