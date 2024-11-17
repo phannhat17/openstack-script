@@ -4,6 +4,8 @@ This repository contains a set of scripts to automate the installation and confi
 
 Working with OpenStack 2024.1 and Ubuntu 22.04 LTS
 
+![](./assets/demo.gif)
+
 ## Requirements
 
 - **Operating System**: Ubuntu server 22.04
