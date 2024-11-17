@@ -293,6 +293,4 @@ configure_nova_for_neutron
 populate_neutron_database
 finalize_neutron_installation
 
-reboot
-
 echo "${GREEN}OpenStack Networking (Neutron) setup completed.${RESET}"

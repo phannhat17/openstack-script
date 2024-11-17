@@ -152,6 +152,4 @@ configure_openvswitch_agent
 configure_nova_conf_for_neutron
 restart_services
 
-reboot
-
 echo "${GREEN}OpenStack Networking (Neutron) setup on compute node completed.${RESET}"
