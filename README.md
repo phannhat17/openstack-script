@@ -16,6 +16,76 @@ Working with OpenStack 2024.1 and Ubuntu 22.04 LTS
 
 Read more [here](https://docs.openstack.org/install-guide/environment-networking.html).
 
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Hostname</th>
+            <th>NICs</th>
+            <th>IP Address</th>
+            <th>Gateway</th>
+            <th>DNS</th>
+            <th>RAM (GB)</th>
+            <th>CPU</th>
+            <th>DISK1 (GB)</th>
+            <th>DISK2 (GB)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="2">controller</td>
+            <td>ens33</td>
+            <td>192.168.133.11/24</td>
+            <td>192.168.133.2</td>
+            <td>8.8.8.8</td>
+            <td rowspan="2">8</td>
+            <td rowspan="2">2</td>
+            <td rowspan="2">40</td>
+            <td rowspan="2"></td>
+        </tr>
+        <tr>
+            <td>ens34</td>
+            <td>10.0.0.11/24</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td rowspan="2">compute</td>
+            <td>ens33</td>
+            <td>192.168.133.21/24</td>
+            <td>192.168.133.2</td>
+            <td>8.8.8.8</td>
+            <td rowspan="2">8</td>
+            <td rowspan="2">4</td>
+            <td rowspan="2">40</td>
+            <td rowspan="2"></td>
+        </tr>
+        <tr>
+            <td>ens34</td>
+            <td>10.0.0.21/24</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td rowspan="2">block</td>
+            <td>ens33</td>
+            <td>192.168.133.31/24</td>
+            <td>192.168.133.2</td>
+            <td>8.8.8.8</td>
+            <td rowspan="2">4</td>
+            <td rowspan="2">2</td>
+            <td rowspan="2">40</td>
+            <td rowspan="2">100</td>
+        </tr>
+        <tr>
+            <td>ens34</td>
+            <td>10.0.0.31/24</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
 ## Installation
 
 ### 1. **Clone the Repository**
