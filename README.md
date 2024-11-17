@@ -7,7 +7,8 @@ Working with OpenStack 2024.1 and Ubuntu 22.04 LTS
 ## Requirements
 
 - **Operating System**: Ubuntu server 22.04
-- **Virtualization Software**: Oracle VirtualBox (or another compatible hypervisor)
+- **Virtualization Software**: VMware Workstation (or another compatible hypervisor)
+- **Network Configuration**: Ensure the network topology matches the OpenStack requirements.
 
 ## Network Topology
 
@@ -32,7 +33,11 @@ Ensure each node (Controller, Compute, Storage) is up and accessible as **root**
 
 The Storage Node needs to have atleast two disks connected. And if this Node use LVM on the OS disk, read more [here](https://docs.openstack.org/cinder/2024.1/install/cinder-storage-install-ubuntu.html)
 
-### 3. **Run the IP config Script**
+### 3. **Edit the Configuration Files**
+
+`config.cfg`: This file contains configuration variables such as IP addresses, hostnames, network interfaces, and service passwords. Ensure that these values are set correctly before running the scripts.
+
+### 4. **Run the IP config Script**
 
 On each node (Controller, Compute, Storage), run the IP config script:
 
@@ -44,7 +49,7 @@ On each node (Controller, Compute, Storage), run the IP config script:
 
 The script will prompt you to select which node (Controller, Compute, or Storage) you are configuring. It will then update the network settings adn reboot that node.
 
-### 4. **Run the Service install Script**
+### 5. **Run the Service install Script**
 
 On each node (Controller, Compute, Storage), run the service install script:
 
