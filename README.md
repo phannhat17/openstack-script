@@ -20,7 +20,7 @@ Read more [here](https://docs.openstack.org/install-guide/environment-networking
 ### 1. **Clone the Repository**
 
 ```bash
-git clone https://github.com/phannhat17/openstack-script.git
+git clone -b vmware https://github.com/phannhat17/openstack-script.git
 cd openstack-script
 find . -type f -exec chmod +x {} \;
 cd scripts

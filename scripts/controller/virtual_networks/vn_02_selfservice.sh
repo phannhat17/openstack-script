@@ -5,7 +5,8 @@ source config.cfg
 
 # Function to create self-service network, subnet, and router with provider connectivity
 create_self_service_network() {
-    source /root/demo-openrc
+
+    source /root/admin-openrc
 
     echo "${YELLOW}Creating self-service network...${RESET}"
     openstack network create selfservice

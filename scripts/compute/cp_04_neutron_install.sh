@@ -32,58 +32,46 @@ configure_neutron_conf() {
     echo "${GREEN}Neutron configuration updated in $neutron_conf.${RESET}"
 }
 
-update_netplan_for_ovs() {
-    echo "${YELLOW}Updating Netplan configuration for Open vSwitch...${RESET}"
+persist_manual_configuration() {
+    echo "${YELLOW}Persisting manual configuration for Open vSwitch...${RESET}"
 
-    # Define the netplan file path (only YAML file in /etc/netplan/)
-    NETPLAN_FILE=$(find /etc/netplan/ -type f -name "*.yaml" | head -n 1)
+    cat << EOF | sudo tee /usr/local/bin/setup-bridge.sh > /dev/null
+#!/bin/bash
 
-    if [ -z "$NETPLAN_FILE" ]; then
-        echo "${RED}Error: No netplan file found in /etc/netplan/${RESET}"
-        exit 1
-    fi
+# Flush existing IPs
+ip addr flush dev $OS_PROVIDER_INTERFACE_NAME
 
-    cat << EOF | sudo tee $NETPLAN_FILE > /dev/null
-network:
-  ethernets:
-    $INTERFACE_HOST_CONTROL:
-      dhcp4: no
-      addresses:
-        - ${COM_HOST_CONTROL}/${NETMASK}
+# Bring up the bridge
+ip link set $OS_PROVIDER_BRIDGE_NAME up
 
-    $INTERFACE_MANAGEMENT:
-      dhcp4: no
-      addresses:
-        - ${COM_MANAGEMENT}/${NETMASK}
-      routes:
-        - to: 0.0.0.0/0
-          via: ${GW_MANAGEMENT}
-      nameservers:
-        addresses:
-          - 8.8.8.8
-          
-    $OS_PROVIDER_INTERFACE_NAME:
-      dhcp4: no
+# Add IP address to the bridge
+ip addr add $COM_PROVIDER/$NETMASK dev $OS_PROVIDER_BRIDGE_NAME
 
-  bridges:
-    $OS_PROVIDER_BRIDGE_NAME:
-      dhcp4: no
-      interfaces:
-        - $OS_PROVIDER_INTERFACE_NAME
-      addresses:
-        - ${COM_PROVIDER}/${NETMASK}
-      routes:
-        - to: 0.0.0.0/0
-          via: ${OS_PROVIDER_GATEWAY}
-      nameservers:
-        addresses:
-          - 8.8.8.8
-
-  version: 2
+# Add default route
+ip route add default via $GW_PROVIDER
 EOF
 
-    sudo netplan apply
-    echo "${GREEN}Netplan configuration updated successfully for Open vSwitch.${RESET}"
+    sudo chmod +x /usr/local/bin/setup-bridge.sh
+
+    cat << EOF | sudo tee /etc/systemd/system/setup-bridge.service > /dev/null
+[Unit]
+Description=Set up Open vSwitch bridge
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/setup-bridge.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable setup-bridge.service
+    sudo systemctl start setup-bridge.service
+    echo "${GREEN}Manual configuration persisted successfully.${RESET}"
 }
 
 
@@ -97,18 +85,23 @@ configure_openvswitch_agent() {
     cp $ovs_agent_conf $ovs_agent_conf_bak
     egrep -v "^#|^$" $ovs_agent_conf_bak > $ovs_agent_conf
 
-    # [ovs] section - map provider network and configure overlay IP
-    crudini --set "$ovs_agent_conf" "ovs" "bridge_mappings" "provider:$PROVIDER_BRIDGE_NAME"
-    crudini --set "$ovs_agent_conf" "ovs" "local_ip" "$COM_MANAGEMENT"
+    # Enable bridge filter support
+    sudo sysctl -w net.ipv4.ip_forward=1
+
+    sudo modprobe br_netfilter
+    sudo sysctl -w net.bridge.bridge-nf-call-iptables=1
+    sudo sysctl -w net.bridge.bridge-nf-call-arptables=1
+    sudo sysctl -w net.bridge.bridge-nf-call-ip6tables=1
 
     # Ensure the provider bridge is created and add the provider interface to the bridge
-    # Flush IP from OS_PROVIDER_INTERFACE_NAME
-    sudo ip addr flush dev $OS_PROVIDER_INTERFACE_NAME
-
     echo "${YELLOW}Creating provider bridge and adding interface...${RESET}"
     sudo ovs-vsctl add-br $OS_PROVIDER_BRIDGE_NAME
     sudo ovs-vsctl add-port $OS_PROVIDER_BRIDGE_NAME $OS_PROVIDER_INTERFACE_NAME
-    sudo ip addr add "$COM_PROVIDER/$NETMASK" dev $OS_PROVIDER_BRIDGE_NAME
+
+
+    # [ovs] section - map provider network and configure overlay IP
+    crudini --set "$ovs_agent_conf" "ovs" "bridge_mappings" "provider:$OS_PROVIDER_BRIDGE_NAME"
+    crudini --set "$ovs_agent_conf" "ovs" "local_ip" "$COM_MANAGEMENT"
 
     # [agent] section - enable VXLAN and layer-2 population
     crudini --set "$ovs_agent_conf" "agent" "tunnel_types" "vxlan"
@@ -117,36 +110,11 @@ configure_openvswitch_agent() {
     # [securitygroup] section - enable security groups and set firewall driver
     crudini --set "$ovs_agent_conf" "securitygroup" "enable_security_group" "true"
     crudini --set "$ovs_agent_conf" "securitygroup" "firewall_driver" "openvswitch"
-    
-    # Enable bridge filter support
-    sudo modprobe br_netfilter
-    sudo tee /etc/sysctl.d/99-sysctl.conf > /dev/null << SYSCTL_EOF
-net.bridge.bridge-nf-call-iptables=1
-net.bridge.bridge-nf-call-ip6tables=1
-SYSCTL_EOF
-    sudo sysctl --system
 
-    update_netplan_for_ovs
+    persist_manual_configuration
+    systemctl restart openvswitch-switch
 
     echo "${GREEN}Open vSwitch agent configuration completed.${RESET}"
-}
-
-# Function to enable bridge networking support for the hybrid iptables firewall driver (if required)
-enable_bridge_networking() {
-    echo "${YELLOW}Enabling bridge networking support for hybrid iptables firewall...${RESET}"
-
-    # Load the br_netfilter kernel module
-    sudo modprobe br_netfilter
-
-    # Enable bridge filtering for iptables
-    sudo tee /etc/sysctl.d/99-sysctl.conf > /dev/null << EOF
-net.bridge.bridge-nf-call-iptables=1
-net.bridge.bridge-nf-call-ip6tables=1
-EOF
-
-    # Apply the changes
-    sudo sysctl --system
-    echo "${GREEN}Bridge networking support enabled.${RESET}"
 }
 
 # Function to configure nova.conf to use Neutron
@@ -181,7 +149,6 @@ install_neutron_openvswitch_agent
 configure_neutron_conf
 
 configure_openvswitch_agent
-enable_bridge_networking
 
 configure_nova_conf_for_neutron
 restart_services
