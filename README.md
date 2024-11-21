@@ -140,7 +140,7 @@ The script will prompt you to select which node (Controller, Compute, or Storage
 | 1 | Openstack Dashboard | http://10.0.0.11/horizon |
 | 2 | Prometheus          | http://10.0.0.10:9090    |
 | 3 | Openstack exporter  | http://10.0.0.10:9180    |
-| 4 | Grafana             | Updating                 |
+| 4 | Grafana             | http://10.0.0.10:3000    |
 
 ## License
 
