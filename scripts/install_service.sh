@@ -189,8 +189,8 @@ install_monitor() {
             case $1 in
                 1) ./monitor/mon_01_env.sh ;;
                 2) ./monitor/mon_02_openstack_exporter.sh ;;
-                2) ./monitor/mon_02_prometheus.sh ;;
-                3) ./monitor/mon_03_grafana.sh ;;
+                3) ./monitor/mon_02_prometheus.sh ;;
+                4) ./monitor/mon_03_grafana.sh ;;
                 *) echo "Invalid service number: $1" ;;
             esac
             mark_installed "Monitor-$1"
@@ -198,7 +198,7 @@ install_monitor() {
     }
 
     if [[ "$service_choice" =~ ^[Aa]$ ]]; then
-        for i in {1..3}; do
+        for i in {1..4}; do
             install_service "$i"
         done
     else
