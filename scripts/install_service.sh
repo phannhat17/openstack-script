@@ -172,17 +172,63 @@ install_storage() {
     echo "Storage Node installation completed."
 }
 
+# Function to install services on the Monitor node
+install_monitor() {
+    echo "Select services to install on Monitor Node (e.g., 1 or A for all):"
+    echo "1) Environment Setup and OpenStack Exporter $(service_status "Monitor-1")"
+    echo "2) Prometheus $(service_status "Monitor-2")"
+    echo "3) Grafana $(service_status "Monitor-3")"
+    echo "A) All"
+    read -p "Enter your choice: " service_choice
+
+    install_service() {
+        if is_installed "Monitor-$1"; then
+            echo "Service $1 is already installed."
+        else
+            case $1 in
+                1) ./monitor/mon_01_env_openstack_exporter.sh ;;
+                2) ./monitor/mon_02_prometheus.sh ;;
+                3) ./monitor/mon_03_grafana.sh ;;
+                *) echo "Invalid service number: $1" ;;
+            esac
+            mark_installed "Monitor-$1"
+        fi
+    }
+
+    if [[ "$service_choice" =~ ^[Aa]$ ]]; then
+        for i in {1..3}; do
+            install_service "$i"
+        done
+    else
+        IFS=' ' read -r -a choices <<< "$service_choice"
+        for choice in "${choices[@]}"; do
+            if [[ "$choice" =~ ^[0-9]+-[0-9]+$ ]]; then
+                IFS='-' read -r start end <<< "$choice"
+                for ((i=start; i<=end; i++)); do
+                    install_service "$i"
+                done
+            else
+                install_service "$choice"
+            fi
+        done
+    fi
+
+    echo "Monitor Node installation completed."
+}
+
 # Main script logic
 echo "Select the node to install:"
 echo "1) Controller Node"
 echo "2) Compute Node"
 echo "3) Storage Node"
+echo "4) Monitor Node"
 read -p "Enter the number corresponding to the node: " node_choice
 
 case $node_choice in
     1) install_controller ;;
     2) install_compute ;;
     3) install_storage ;;
+    4) install_monitor ;;
     *) echo "Invalid choice. Exiting." ;;
 esac
 
