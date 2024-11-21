@@ -133,6 +133,15 @@ On each node (Controller, Compute, Storage), run the service install script:
 
 The script will prompt you to select which node (Controller, Compute, or Storage) you are configuring.
 
+## Service Endpoints
+
+|   | Service             | Endpoint                 |
+|---|---------------------|--------------------------|
+| 1 | Openstack Dashboard | http://10.0.0.11/horizon |
+| 2 | Prometheus          | http://10.0.0.10:9090    |
+| 3 | Openstack exporter  | http://10.0.0.10:9180    |
+| 4 | Grafana             | Updating                 |
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
