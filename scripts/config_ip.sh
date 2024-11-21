@@ -32,7 +32,8 @@ update_hosts_file() {
 
     if [ -n "$CTL_MANAGEMENT" ] && [ -n "$CTL_HOSTNAME" ] && \
        [ -n "$COM_MANAGEMENT" ] && [ -n "$COM_HOSTNAME" ] && \
-       [ -n "$BLK_MANAGEMENT" ] && [ -n "$BLK_HOSTNAME" ]; then
+       [ -n "$BLK_MANAGEMENT" ] && [ -n "$BLK_HOSTNAME" ] && \
+       [ -n "$MON_MANAGEMENT" ] && [ -n "$MON_HOSTNAME" ]; then
         
         sudo tee -a /etc/hosts > /dev/null << EOF
 
@@ -40,6 +41,7 @@ update_hosts_file() {
 $CTL_MANAGEMENT $CTL_HOSTNAME
 $COM_MANAGEMENT $COM_HOSTNAME
 $BLK_MANAGEMENT $BLK_HOSTNAME
+$MON_MANAGEMENT $MON_HOSTNAME
 EOF
         echo "${GREEN}/etc/hosts updated successfully with new entries.${RESET}"
     else
@@ -51,7 +53,6 @@ EOF
 change_ip() {
     local management_ip_var="$1"
     local provider_ip_var="$2"
-    local host_control_ip_var="$3"
     local management_ip="${!management_ip_var}"
     local provider_ip="${!provider_ip_var}"
 
@@ -100,20 +101,25 @@ echo "Select the node to configure:"
 echo "1) Controller"
 echo "2) Compute"
 echo "3) Block Storage"
+echo "4) Monitor"
 read -p "Enter the number corresponding to the node: " node_choice
 
 case $node_choice in
     1)
         change_hostname CTL_HOSTNAME
-        change_ip CTL_MANAGEMENT CTL_PROVIDER CTL_HOST_CONTROL
+        change_ip CTL_MANAGEMENT CTL_PROVIDER
         ;;
     2)
         change_hostname COM_HOSTNAME
-        change_ip COM_MANAGEMENT COM_PROVIDER COM_HOST_CONTROL
+        change_ip COM_MANAGEMENT COM_PROVIDER
         ;;
     3)
         change_hostname BLK_HOSTNAME
-        change_ip BLK_MANAGEMENT BLK_PROVIDER BLK_HOST_CONTROL
+        change_ip BLK_MANAGEMENT BLK_PROVIDER
+        ;;
+    4)
+        change_hostname MON_HOSTNAME
+        change_ip MON_MANAGEMENT MON_PROVIDER
         ;;
     *)
         echo "${RED}Invalid choice. Exiting.${RESET}"
