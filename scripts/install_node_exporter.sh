@@ -10,12 +10,12 @@ install_node_exporter() {
     # Extract version from URL
     NODE_EXPORTER_VERSION=$(echo "$NODE_EXPORTER_URL" | grep -oP 'v\K[0-9.]+')
 
-    if [ -z "$PROM_VERSION" ]; then
-        echo -e "${RED}Failed to extract Prometheus version from URL. Please check the URL.${RESET}"
+    if [ -z "$NODE_EXPORTER_VERSION" ]; then
+        echo -e "${RED}Failed to extract version from URL. Please check the URL.${RESET}"
         exit 1
     fi
 
-    echo -e "${YELLOW}Detected Prometheus version: ${PROM_VERSION}${RESET}"
+    echo -e "${YELLOW}Detected version: ${NODE_EXPORTER_VERSION}${RESET}"
 
 
     # Download and extract Node Exporter
