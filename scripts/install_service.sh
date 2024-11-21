@@ -175,9 +175,10 @@ install_storage() {
 # Function to install services on the Monitor node
 install_monitor() {
     echo "Select services to install on Monitor Node (e.g., 1 or A for all):"
-    echo "1) Environment Setup and OpenStack Exporter $(service_status "Monitor-1")"
-    echo "2) Prometheus $(service_status "Monitor-2")"
-    echo "3) Grafana $(service_status "Monitor-3")"
+    echo "1) Environment Setup $(service_status "Monitor-1")"
+    echo "2) Openstack exporter $(service_status "Monitor-2")"
+    echo "3) Prometheus $(service_status "Monitor-3")"
+    echo "4) Grafana $(service_status "Monitor-4")"
     echo "A) All"
     read -p "Enter your choice: " service_choice
 
@@ -186,7 +187,8 @@ install_monitor() {
             echo "Service $1 is already installed."
         else
             case $1 in
-                1) ./monitor/mon_01_env_openstack_exporter.sh ;;
+                1) ./monitor/mon_01_env.sh ;;
+                2) ./monitor/mon_02_openstack_exporter.sh ;;
                 2) ./monitor/mon_02_prometheus.sh ;;
                 3) ./monitor/mon_03_grafana.sh ;;
                 *) echo "Invalid service number: $1" ;;
