@@ -3,6 +3,27 @@
 # Load configuration from config.cfg
 source config.cfg
 
+# Function to configure DNS via systemd-resolved
+configure_dns_systemd_resolved() {
+    echo "${YELLOW}Configuring systemd-resolved to use DNS 8.8.8.8...${RESET}"
+    local resolved_conf="/etc/systemd/resolved.conf"
+
+    # Backup the original configuration
+    sudo cp $resolved_conf "${resolved_conf}.bak"
+
+    # Update the DNS configuration
+    sudo sed -i '/^#DNS=/c\DNS=8.8.8.8' $resolved_conf
+
+    # Restart systemd-resolved to apply changes
+    sudo systemctl restart systemd-resolved
+
+    # Verify the configuration
+    echo "${YELLOW}Verifying DNS configuration...${RESET}"
+    resolvectl status | grep "DNS Servers"
+
+    echo "${GREEN}systemd-resolved configured successfully.${RESET}"
+}
+
 # Function to install the Neutron Open vSwitch agent
 install_neutron_openvswitch_agent() {
     echo "${YELLOW}Installing Neutron Open vSwitch agent...${RESET}"
@@ -74,7 +95,6 @@ EOF
     echo "${GREEN}Manual configuration persisted successfully.${RESET}"
 }
 
-
 # Function to configure the Open vSwitch agent
 configure_openvswitch_agent() {
     local ovs_agent_conf="/etc/neutron/plugins/ml2/openvswitch_agent.ini"
@@ -145,11 +165,10 @@ restart_services() {
 }
 
 # Run all functions in sequence
+configure_dns_systemd_resolved
 install_neutron_openvswitch_agent
 configure_neutron_conf
-
 configure_openvswitch_agent
-
 configure_nova_conf_for_neutron
 restart_services
 

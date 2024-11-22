@@ -279,6 +279,26 @@ finalize_neutron_installation() {
     echo "${GREEN}Neutron services restarted successfully.${RESET}"
 }
 
+configure_dns_systemd_resolved() {
+    echo "${YELLOW}Configuring systemd-resolved to use DNS 8.8.8.8...${RESET}"
+    local resolved_conf="/etc/systemd/resolved.conf"
+
+    # Backup the original configuration
+    sudo cp $resolved_conf "${resolved_conf}.bak"
+
+    # Update the DNS configuration
+    sudo sed -i '/^#DNS=/c\DNS=8.8.8.8' $resolved_conf
+
+    # Restart systemd-resolved to apply changes
+    sudo systemctl restart systemd-resolved
+
+    # Verify the configuration
+    echo "${YELLOW}Verifying DNS configuration...${RESET}"
+    resolvectl status | grep "DNS Servers"
+
+    echo "${GREEN}systemd-resolved configured successfully.${RESET}"
+}
+
 # Run all functions in sequence
 configure_neutron_database
 create_neutron_user
@@ -291,6 +311,7 @@ configure_openvswitch_agent
 configure_l3_agent
 configure_dhcp_agent
 configure_nova_for_neutron
+configure_dns_systemd_resolved
 populate_neutron_database
 finalize_neutron_installation
 
