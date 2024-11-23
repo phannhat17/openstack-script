@@ -101,9 +101,8 @@ EOF
 
 # Function to generate dynamic Prometheus target file
 generate_target_file() {
-    echo -e "${YELLOW}Generating Prometheus target file...${RESET}"
-
-    TARGET_FILE="/etc/prometheus/vm_monitor_targets.json"
+    echo -e "${YELLOW}Starting the generation of Prometheus target file...${RESET}"
+    echo -e "${YELLOW}Step 1: Extracting subnet prefix from OS_PROVIDER_SUBNET...${RESET}"
 
     # Extract the subnet prefix from OS_PROVIDER_SUBNET
     SUBNET_PREFIX=$(echo "$OS_PROVIDER_SUBNET" | awk -F'.' '{print $1"."$2"."$3"."}')
@@ -111,15 +110,31 @@ generate_target_file() {
         echo -e "${RED}Failed to parse OS_PROVIDER_SUBNET. Ensure it's in CIDR format (e.g., 192.168.133.0/24).${RESET}"
         exit 1
     fi
+    echo -e "${GREEN}Subnet prefix extracted: ${SUBNET_PREFIX}${RESET}"
 
+    echo -e "${YELLOW}Step 2: Fetching server list from OpenStack...${RESET}"
     # Fetch server details from OpenStack
-    source /root/admin-openrc
     SERVER_LIST=$(openstack server list -f json)
+    if [ -z "$SERVER_LIST" ]; then
+        echo -e "${RED}Failed to fetch server list from OpenStack. Please ensure OpenStack CLI is installed and configured.${RESET}"
+        exit 1
+    fi
+    echo -e "${GREEN}Server list fetched successfully.${RESET}"
+    echo -e "${YELLOW}Server list JSON:${RESET}"
+    echo "$SERVER_LIST"
 
+    echo -e "${YELLOW}Step 3: Extracting IPs from server list that match the subnet prefix...${RESET}"
     # Parse targets for all VMs within the specified subnet
     VM_TARGETS=$(echo "$SERVER_LIST" | jq -r --arg prefix "$SUBNET_PREFIX" '.[] | .Networks | to_entries[] | .value[] | select(startswith($prefix))' | sed "s/$/:9100/")
+    if [ -z "$VM_TARGETS" ]; then
+        echo -e "${RED}No matching IPs found in the specified subnet: ${SUBNET_PREFIX}${RESET}"
+        exit 1
+    fi
+    echo -e "${GREEN}Extracted VM targets:${RESET}"
+    echo "$VM_TARGETS"
 
-    # Generate JSON content
+    echo -e "${YELLOW}Step 4: Generating Prometheus target file...${RESET}"
+    TARGET_FILE="/etc/prometheus/vm_monitor_targets.json"
     sudo tee "$TARGET_FILE" > /dev/null <<EOF
 [
   {
@@ -132,9 +147,13 @@ $(echo "$VM_TARGETS" | sed 's/^/      "/; s/$/",/' | sed '$ s/,$//')
   }
 ]
 EOF
+    echo -e "${GREEN}Prometheus target file generated at ${TARGET_FILE}.${RESET}"
+    echo -e "${YELLOW}Content of the target file:${RESET}"
+    sudo cat "$TARGET_FILE"
 
-    echo -e "${GREEN}Targets written to $TARGET_FILE.${RESET}"
+    echo -e "${YELLOW}Step 5: Target file generation complete.${RESET}"
 }
+
 
 
 # Function to set up a cron job for target file generation

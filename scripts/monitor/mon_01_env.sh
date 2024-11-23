@@ -47,9 +47,17 @@ config_ntp_service() {
     echo "${GREEN}Chrony configured successfully.${RESET}"
 }
 
+# Function to install jq
+install_jq() {
+    echo -e "${YELLOW}Installing jq...${RESET}"
+    sudo apt install -y jq
+    echo -e "${GREEN}jq installed successfully.${RESET}"
+}
+
 # Run the functions in sequence
 update_upgrade
 add_repo
+install_jq
 install_crudini
 install_ops_packages
 config_ntp_service
