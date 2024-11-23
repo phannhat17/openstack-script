@@ -22,6 +22,24 @@ install_openstack_exporter() {
     fi
 }
 
+create_openrc_files() {
+    echo "${YELLOW}Creating admin-openrc files in /root/...${RESET}"
+
+    # Admin OpenRC
+    sudo tee /root/admin-openrc > /dev/null << EOF
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=$ADMIN_PASS
+export OS_AUTH_URL=http://controller:5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+EOF
+
+    echo "${GREEN}OpenRC files created successfully in /root/.${RESET}"
+}
+
 # Function to create configuration YAML
 create_config_yaml() {
     echo -e "${YELLOW}Creating configuration YAML for OpenStack Exporter...${RESET}"
@@ -82,6 +100,7 @@ EOF
 
 # Run the functions in sequence
 install_openstack_exporter
+create_openrc_files
 create_config_yaml
 setup_systemd_service
 
