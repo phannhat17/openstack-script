@@ -114,7 +114,7 @@ generate_target_file() {
 
     echo -e "${YELLOW}Step 2: Fetching server list from OpenStack...${RESET}"
     # Fetch server details from OpenStack
-    SERVER_LIST=$(openstack server list -f json)
+    SERVER_LIST=$(source /root/admin-openrc; openstack server list -f json)
     if [ -z "$SERVER_LIST" ]; then
         echo -e "${RED}Failed to fetch server list from OpenStack. Please ensure OpenStack CLI is installed and configured.${RESET}"
         exit 1
