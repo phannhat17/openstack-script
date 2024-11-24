@@ -10,9 +10,11 @@ source controller/virtual_networks/vn_02_selfservice.sh
 create_flavor() {
     source /root/admin-openrc
 
-    echo "${YELLOW}Creating m1.nano flavor...${RESET}"
+    echo "${YELLOW}Creating flavor...${RESET}"
     openstack flavor create --id 0 --vcpus 1 --ram 64 --disk 1 m1.nano
-    echo "${GREEN}m1.nano flavor created successfully.${RESET}"
+
+    openstack flavor create --id 1 --vcpus 2 --ram 2048 --disk 20 vm
+    echo "${GREEN}Flavor created successfully.${RESET}"
 }
 
 # Function to generate and add SSH key pair
