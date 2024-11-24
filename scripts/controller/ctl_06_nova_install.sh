@@ -110,6 +110,8 @@ install_configure_nova() {
     crudini --set "$nova_conf" "placement" "username" "placement"
     crudini --set "$nova_conf" "placement" "password" "$PLACEMENT_PASS"
 
+    crudini --set "$nova_conf" "scheduler" "discover_hosts_in_cells_interval" "300"
+
     echo "${GREEN}Nova configuration updated.${RESET}"
 }
 
